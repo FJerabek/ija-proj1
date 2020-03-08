@@ -3,6 +3,7 @@ package vut.fit.ija.proj1.data;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
+import javafx.scene.text.Text;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,12 +21,15 @@ public class Street extends GuiElement {
 
     @Override
     public Coordinates getCoordinates() {
-        return new Coordinates(Math.abs(from.getX() - to.getX()), Math.abs(from.getY() - to.getY()));
+        return new Coordinates((from.getX() + to.getX()) / 2, (from.getY() + to.getY()) / 2);
     }
 
     @Override
     public List<Shape> draw() {
-        return null;
+        return Arrays.asList(
+                new Text(getCoordinates().getX(), getCoordinates().getY(), name),
+                new Line(from.getX(), from.getY(), to.getX(), to.getY())
+        );
     }
 
     public String getName() {

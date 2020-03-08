@@ -27,7 +27,9 @@ public class Stop extends GuiElement {
 
     @Override
     public List<Shape> draw() {
-        return Arrays.asList(new Text(coordinates.getX() +10, coordinates.getY(), id), new Circle(coordinates.getX(), coordinates.getY(), 5, Color.RED));
+        Text text = new Text(coordinates.getX() +10, coordinates.getY(), id);
+        Circle circle = new Circle(coordinates.getX(), coordinates.getY(), 5, Color.RED);
+        return Arrays.asList(text, circle);
     }
 
 
