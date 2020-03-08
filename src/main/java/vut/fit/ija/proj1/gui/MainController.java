@@ -1,13 +1,15 @@
 package vut.fit.ija.proj1.gui;
 
 import javafx.fxml.FXML;
+import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
+import javafx.scene.shape.Line;
+import vut.fit.ija.proj1.data.Coordinates;
+import vut.fit.ija.proj1.data.Stop;
 
 public class MainController {
     @FXML
@@ -17,6 +19,15 @@ public class MainController {
     private ScrollPane scroll;
 
     @FXML
+    private Pane content;
+
+    @FXML
+    private Group group;
+
+    @FXML
+    private StackPane stackPane;
+
+    @FXML
     private void onStackPaneScroll(ScrollEvent e) {
         if (e.isControlDown()) {
             e.consume();
@@ -24,31 +35,28 @@ public class MainController {
             double zoom = e.getDeltaY() > 0 ? 1.1 : 1 / 1.1;
             canvas.setScaleX(zoom * canvas.getScaleX());
             canvas.setScaleY(zoom * canvas.getScaleY());
+            content.setScaleX(zoom * content.getScaleX());
+            content.setScaleY(zoom * content.getScaleY());
             scroll.layout();
         }
     }
 
     @FXML
     private void onLoad() {
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.fillText("WEEEEE", 100, 100);
-        gc.strokeLine(100, 100, 20, 50);
-
-        gc.setStroke(Color.LIGHTGRAY);
-        gc.setLineWidth(0.5);
-        gc.beginPath();
-        for (int i = 0; i < canvas.getHeight(); i += 15) {
-            gc.moveTo(0, i);
-            gc.lineTo(canvas.getWidth(), i);
+        for (int i = 0; i < content.getHeight(); i += 15) {
+            Line line = new Line(0, i, content.getWidth(), i);
+            line.setStrokeWidth(0.5);
+            line.setOpacity(0.3);
+            content.getChildren().add(line);
         }
 
         for (int i = 0; i < canvas.getWidth(); i += 15) {
-            gc.moveTo(i, 0);
-            gc.lineTo(i, canvas.getHeight());
+            Line line = new Line(i, 0, i, content.getHeight());
+            line.setStrokeWidth(0.2);
+            line.setOpacity(0.3);
+            content.getChildren().add(line);
         }
-        gc.stroke();
-
-        gc.setFill(Paint.valueOf("red"));
-        gc.fillOval(50,50,20,20);
+        Stop stop = new Stop("Test Stop", new Coordinates(50, 50));
+        content.getChildren().addAll(stop.draw());
     }
 }
