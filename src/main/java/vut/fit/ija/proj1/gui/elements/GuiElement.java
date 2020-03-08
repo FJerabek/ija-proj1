@@ -1,7 +1,8 @@
-package vut.fit.ija.proj1.data;
+package vut.fit.ija.proj1.gui.elements;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.shape.Shape;
+import vut.fit.ija.proj1.data.Coordinates;
 
 import java.util.List;
 

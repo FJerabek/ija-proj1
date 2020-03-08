@@ -1,12 +1,15 @@
-package vut.fit.ija.proj1.data;
+package vut.fit.ija.proj1.gui.elements;
 
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
+import vut.fit.ija.proj1.data.Coordinates;
+import vut.fit.ija.proj1.gui.elements.GuiElement;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class Street extends GuiElement {
     private String name;
@@ -42,5 +45,18 @@ public class Street extends GuiElement {
 
     public Coordinates getTo() {
         return to;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Street street = (Street) o;
+        return name.equals(street.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 }

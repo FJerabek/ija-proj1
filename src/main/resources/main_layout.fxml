@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.Group?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
@@ -13,13 +14,18 @@
 <AnchorPane prefHeight="466.0" prefWidth="654.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vut.fit.ija.proj1.gui.MainController">
     <SplitPane dividerPositions="0.7725752508361204" layoutY="24.0" prefHeight="376.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
         <ScrollPane fx:id="scroll" pannable="true" prefHeight="200.0" prefWidth="200.0">
-            <StackPane fx:id="stackPane" onScroll="#onStackPaneScroll" prefHeight="438.0" prefWidth="500.0">
+            <StackPane fx:id="stackPane" onMouseClicked="#onClicked" onScroll="#onStackPaneScroll" prefHeight="438.0" prefWidth="500.0">
                 <Group fx:id="group" mouseTransparent="true">
-               <Pane fx:id="content" prefHeight="1000.0" prefWidth="1000.0" />
+               <Pane fx:id="content" layoutX="14.0" onMouseClicked="#onClicked" prefHeight="1000.0" prefWidth="1000.0" />
                 </Group>
             </StackPane>
         </ScrollPane>
-      <AnchorPane prefHeight="200.0" prefWidth="200.0" />
+      <AnchorPane prefHeight="200.0" prefWidth="200.0">
+         <children>
+            <Label layoutX="25.0" layoutY="6.0" prefHeight="17.0" prefWidth="38.0" text="Time:" AnchorPane.rightAnchor="70.0" AnchorPane.topAnchor="10.0" />
+            <Label fx:id="time" layoutX="103.0" layoutY="10.0" text="50" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+         </children>
+      </AnchorPane>
     </SplitPane>
     <MenuBar maxHeight="25.0" prefHeight="25.0" prefWidth="600.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <Menu mnemonicParsing="false" text="File">
