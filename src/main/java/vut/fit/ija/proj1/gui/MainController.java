@@ -69,11 +69,11 @@ public class MainController {
             new Vehicle(
                     new vut.fit.ija.proj1.data.Line(
                             new ArrayList<>(Arrays.asList(
-                                    stops.get(0),
                                     stops.get(1),
                                     stops.get(2),
                                     stops.get(3),
-                                    stops.get(4)
+                                    stops.get(4),
+                                    stops.get(5)
                             )),
                             "1"
                     ),
@@ -92,10 +92,9 @@ public class MainController {
             new Vehicle(
                     new vut.fit.ija.proj1.data.Line(
                             new ArrayList<>(Arrays.asList(
-                                    stops.get(0),
                                     stops.get(1),
-                                    stops.get(2),
                                     stops.get(3),
+                                    stops.get(2),
                                     stops.get(4)
                             )),
                             "2"

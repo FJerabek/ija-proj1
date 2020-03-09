@@ -67,6 +67,8 @@ public class Vehicle extends GuiElement {
 
         if(path != null) {
             if(nextEntry.getTime().isBefore(time)) {
+                moveGuiPoint(nextEntry.getStop().getCoordinates().getX() - position.getX(), nextEntry.getStop().getCoordinates().getY() - position.getY());
+                position = nextEntry.getStop().getCoordinates();
                 startEntry = nextEntry;
                 nextEntry = timetable.getNextEntry(time);
                 if (nextEntry == null) {
