@@ -1,5 +1,7 @@
 package vut.fit.ija.proj1.data;
 
+import javafx.scene.shape.Line;
+import javafx.scene.shape.Shape;
 import vut.fit.ija.proj1.gui.elements.Street;
 
 import java.util.ArrayList;
@@ -41,6 +43,24 @@ public class Path {
 
         double driven = (distance - length) / currentLength;
         return new Coordinates(a.getX() + (b.getX() - a.getX())*driven, a.getY() + (b.getY() - a.getY())*driven);
+    }
+
+    public Shape getShape() {
+        Shape shape = null;
+        for (int i = 0; i < path.size() - 1; i++) {
+            Coordinates a = path.get(i);
+            Coordinates b = path.get(i+1);
+            if(shape == null) {
+                Line line = new Line(a.getX(), a.getY(), b.getX(), b.getY());
+                line.setStrokeWidth(3);
+                shape = line;
+            } else {
+                Line line = new Line(a.getX(), a.getY(), b.getX(), b.getY());
+                line.setStrokeWidth(3);
+                shape = Shape.union(shape, line);
+            }
+        }
+        return shape;
     }
 
     public double getPathLenght() {

@@ -6,6 +6,7 @@ import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
 import vut.fit.ija.proj1.data.Coordinates;
 
+import java.sql.SQLOutput;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -58,10 +59,6 @@ public class Stop extends GuiElement {
 
     @Override
     public String toString() {
-        return "Stop{" +
-                "id='" + id + '\'' +
-                ", coordinates=" + coordinates +
-                ", street=" + street +
-                '}';
+        return String.format("%s \t %s", id, street.toString());
     }
 }

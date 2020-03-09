@@ -1,6 +1,8 @@
 package vut.fit.ija.proj1.data;
 
+import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -71,11 +73,15 @@ public class Vehicle extends GuiElement {
                     moveGuiPoint(startEntry.getStop().getCoordinates().getX() - position.getX(), startEntry.getStop().getCoordinates().getY() - position.getY());
                     return;
                 } else {
-                    path = Path.getPath(startEntry.getStop().getCoordinates(), nextEntry.getStop().getCoordinates(), streets);
+                    if(nextEntry.getStop().getCoordinates().equals(position)){
+                        path = new Path(Collections.singletonList(position));
+                    } else {
+                        path = Path.getPath(startEntry.getStop().getCoordinates(), nextEntry.getStop().getCoordinates(), streets);
+                    }
                 }
             }
-            double drivenPart =  (time.toNanoOfDay() - startEntry.getTime().toNanoOfDay()) / (double)(nextEntry.getTime().toNanoOfDay() - startEntry.getTime().toNanoOfDay());
 
+            double drivenPart =  (time.toNanoOfDay() - startEntry.getTime().toNanoOfDay()) / (double)(nextEntry.getTime().toNanoOfDay() - startEntry.getTime().toNanoOfDay());
             double distance = path.getPathLenght() * drivenPart;
             if(distance <= 0) {
                 return;
@@ -87,6 +93,16 @@ public class Vehicle extends GuiElement {
         }
     }
 
+    public void setOnSelectListener(OnVehicleSelectListener listener) {
+        for (Shape shape :
+                gui) {
+            shape.onMouseClickedProperty().setValue(event -> {
+                listener.vehicleSelect(this);
+                event.consume();
+            });
+        }
+    }
+
     @Override
     public Coordinates getCoordinates() {
         return position;
@@ -95,5 +111,9 @@ public class Vehicle extends GuiElement {
     @Override
     public List<Shape> draw() {
         return gui;
+    }
+
+    public interface OnVehicleSelectListener {
+        void vehicleSelect(Vehicle vehicle);
     }
 }

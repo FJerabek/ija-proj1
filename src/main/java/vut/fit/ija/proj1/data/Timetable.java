@@ -7,6 +7,7 @@ import java.util.List;
 
 public class Timetable {
     private List<TimetableEntry> entries;
+    private int i = 0;
 
     public Timetable(List<TimetableEntry> entries) {
         this.entries = entries;
@@ -31,17 +32,16 @@ public class Timetable {
     }
 
     public TimetableEntry getNextEntry(LocalTime currentTime) {
-        TimetableEntry nearest = null;
-        for(TimetableEntry entry : entries) {
-            if(nearest == null && entry.getTime().isAfter(LocalTime.now())) {
-                nearest = entry;
-            } else {
-                if(nearest != null && entry.getTime().isBefore(nearest.getTime()) && entry.getTime().isAfter(currentTime)) {
-                    nearest = entry;
-                }
+        TimetableEntry next = null;
+        for (TimetableEntry entry : entries) {
+            if(next == null && entry.getTime().isAfter(currentTime)) {
+                next = entry;
+            } else if (next != null && entry.getTime().isAfter(currentTime) && entry.getTime().isBefore(next.getTime())) {
+                next = entry;
             }
+
         }
-        return nearest;
+        return next;
     }
 
     public void addEntry(TimetableEntry entry) {

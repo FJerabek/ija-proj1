@@ -1,11 +1,10 @@
 package vut.fit.ija.proj1.gui;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Slider;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
@@ -13,6 +12,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Shape;
 import javafx.util.converter.LocalTimeStringConverter;
 import vut.fit.ija.proj1.data.*;
 import vut.fit.ija.proj1.gui.elements.GuiElement;
@@ -27,11 +27,12 @@ import java.util.*;
 public class MainController {
     private LocalTime localTime = LocalTime.now();
     private Timer timer;
+    private Shape selectedShape;
     private TimerTask vehicleUpdate = new TimerTask() {
         @Override
         public void run() {
             Platform.runLater(() -> {
-                localTime = localTime.plusNanos(100000000);
+                localTime = localTime.plusNanos(1000000000);
                 time.setText(localTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")));
                 for (Vehicle vehicle : vehicles) {
                     vehicle.drive(streets, localTime);
@@ -67,8 +68,13 @@ public class MainController {
     private List<Vehicle> vehicles = new ArrayList<>(Arrays.asList(
             new Vehicle(
                     new vut.fit.ija.proj1.data.Line(
-                            new ArrayList<>(),
-                            new ArrayList<>(),
+                            new ArrayList<>(Arrays.asList(
+                                    stops.get(0),
+                                    stops.get(1),
+                                    stops.get(2),
+                                    stops.get(3),
+                                    stops.get(4)
+                            )),
                             "1"
                     ),
                     new TimetableEntry(stops.get(0), LocalTime.now()),
@@ -77,14 +83,21 @@ public class MainController {
                                     new TimetableEntry(stops.get(1), LocalTime.now().plusSeconds(20)),
                                     new TimetableEntry(stops.get(2), LocalTime.now().plusSeconds(30)),
                                     new TimetableEntry(stops.get(3), LocalTime.now().plusSeconds(60)),
-                                    new TimetableEntry(stops.get(4), LocalTime.now().plusSeconds(80))
+                                    new TimetableEntry(stops.get(4), LocalTime.now().plusSeconds(80)),
+                                    new TimetableEntry(stops.get(4), LocalTime.now().plusSeconds(100)),
+                                    new TimetableEntry(stops.get(5), LocalTime.now().plusSeconds(120))
                             )
                     )
             ),
             new Vehicle(
                     new vut.fit.ija.proj1.data.Line(
-                            new ArrayList<>(),
-                            new ArrayList<>(),
+                            new ArrayList<>(Arrays.asList(
+                                    stops.get(0),
+                                    stops.get(1),
+                                    stops.get(2),
+                                    stops.get(3),
+                                    stops.get(4)
+                            )),
                             "2"
                     ),
                     new TimetableEntry(stops.get(4), LocalTime.now()),
@@ -100,10 +113,13 @@ public class MainController {
     ));
 
     @FXML
-    private Slider speed;
+    private TextField timeScale;
 
     @FXML
     private Label time;
+
+    @FXML
+    private ListView<Stop> listView;
 
     @FXML
     private ScrollPane scroll;
@@ -127,7 +143,10 @@ public class MainController {
 
     @FXML
     private void onClicked(MouseEvent e) {
-//        System.out.println(String.format("X: %f  Y: %f", e.getX(), e.getY()));
+        if(selectedShape != null) {
+            content.getChildren().remove(selectedShape);
+        }
+        listView.setItems(null);
     }
 
     public List<Street> getStreets() {
@@ -138,7 +157,29 @@ public class MainController {
         return stops;
     }
 
-
+    @FXML
+    private void onTimeScaleSet() {
+        float scale = Float.parseFloat(timeScale.getText());
+        if(scale == 0) {
+            timer.cancel();
+            timer = new Timer();
+            return;
+        }
+        timer.cancel();
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(() -> {
+                    localTime = localTime.plusNanos(1000000000);
+                    time.setText(localTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+                    for (Vehicle vehicle : vehicles) {
+                        vehicle.drive(streets, localTime);
+                    }
+                });
+            }
+        }, 0, (int) (1000 / scale));
+    }
 
     @FXML
     private void onLoad() {
@@ -156,8 +197,6 @@ public class MainController {
             content.getChildren().add(line);
         }
 
-
-
         List<GuiElement> elements = new ArrayList<>();
 
         elements.addAll(streets);
@@ -168,13 +207,34 @@ public class MainController {
             content.getChildren().addAll(element.draw());
         }
 
-        speed.valueProperty().addListener((observable, oldValue, newValue) -> {
-            timer.cancel();
-            timer = new Timer();
-            timer.scheduleAtFixedRate(vehicleUpdate, 0, (long) (newValue.doubleValue() * 1000));
-        });
-
         timer = new Timer(false);
-        timer.scheduleAtFixedRate(vehicleUpdate, 0, 100);
+        timer.scheduleAtFixedRate(vehicleUpdate, 0, 1000);
+
+        for (Vehicle vehicle :
+                vehicles) {
+            vehicle.setOnSelectListener(vehicle1 -> {
+                if (selectedShape != null) {
+                    content.getChildren().remove(selectedShape);
+                }
+
+                listView.setItems(FXCollections.observableArrayList(vehicle1.getLine().getStops()));
+
+                List<Path> paths = vehicle1.getLine().getPath(streets);
+                Shape shape = null;
+                for (Path path : paths) {
+                    if(shape == null){
+                        shape = path.getShape();
+                    } else {
+                        shape = Shape.union(shape, path.getShape());
+                    }
+                }
+
+                if (shape != null) {
+                    shape.setFill(Color.AQUAMARINE);
+                }
+                selectedShape = shape;
+                content.getChildren().add(shape);
+            });
+        }
     }
 }
