@@ -55,4 +55,13 @@ public class Stop extends GuiElement {
         return Objects.hash(id);
 
     }
+
+    @Override
+    public String toString() {
+        return "Stop{" +
+                "id='" + id + '\'' +
+                ", coordinates=" + coordinates +
+                ", street=" + street +
+                '}';
+    }
 }
