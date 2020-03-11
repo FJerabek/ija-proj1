@@ -1,10 +1,13 @@
 package vut.fit.ija.proj1;
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import vut.fit.ija.proj1.data.Coordinates;
 import vut.fit.ija.proj1.data.Path;
 import vut.fit.ija.proj1.data.TimetableEntry;
@@ -36,6 +39,10 @@ public class MainApplication extends Application {
         path = new Path(Arrays.asList(new Coordinates(0,0), new Coordinates(10 ,10), new Coordinates(15, 10)));
         System.out.println(path.getCoordinatesByDistance(19.145));
 
+        primaryStage.setOnCloseRequest(e -> {
+            Platform.exit();
+            System.exit(0);
+        });
 //        Load map and timetables
     }
 

@@ -6,26 +6,42 @@ import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
 import vut.fit.ija.proj1.data.Coordinates;
 
-import java.sql.SQLOutput;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public class Stop extends GuiElement {
+/**
+ * Class representing single stop on map
+ */
+public class Stop implements Drawable {
     private String id;
     private Coordinates coordinates;
     private Street street;
 
+    /**
+     * Stop constructor
+     * @param id stop id/name
+     * @param coordinates stop coordinates
+     * @param street stop street
+     */
     public Stop(String id, Coordinates coordinates, Street street) {
         this.id = id;
         this.coordinates = coordinates;
         this.street = street;
     }
 
+    /**
+     * Returns stop street
+     * @return street
+     */
     public Street getStreet() {
         return street;
     }
 
+    /**
+     * Returns stop ID
+     * @return stop ID
+     */
     public String getId() {
         return id;
     }

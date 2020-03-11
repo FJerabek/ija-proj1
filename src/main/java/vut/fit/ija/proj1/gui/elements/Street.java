@@ -1,21 +1,28 @@
 package vut.fit.ija.proj1.gui.elements;
 
-import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
 import vut.fit.ija.proj1.data.Coordinates;
-import vut.fit.ija.proj1.gui.elements.GuiElement;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public class Street extends GuiElement {
+/**
+ * Class representing single street on map
+ */
+public class Street implements Drawable {
     private String name;
     private Coordinates from;
     private Coordinates to;
 
+    /**
+     * Street constructor
+     * @param name street name
+     * @param from street from coordinates
+     * @param to street to coordinates
+     */
     public Street(String name, Coordinates from, Coordinates to) {
         this.name = name;
         this.from = from;
@@ -35,14 +42,26 @@ public class Street extends GuiElement {
         );
     }
 
+    /**
+     * Returns street name
+     * @return street name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns street from coordinates
+     * @return street from coordinates
+     */
     public Coordinates getFrom() {
         return from;
     }
 
+    /**
+     * Returns street to coordinates
+     * @return street to coordinates
+     */
     public Coordinates getTo() {
         return to;
     }

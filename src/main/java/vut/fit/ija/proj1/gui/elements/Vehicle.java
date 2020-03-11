@@ -1,26 +1,22 @@
-package vut.fit.ija.proj1.data;
+package vut.fit.ija.proj1.gui.elements;
 
-import javafx.event.EventHandler;
-import javafx.scene.Node;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import vut.fit.ija.proj1.gui.elements.GuiElement;
-import vut.fit.ija.proj1.gui.elements.Street;
+import vut.fit.ija.proj1.data.*;
 
-import java.sql.SQLOutput;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class Vehicle extends GuiElement {
+/**
+ * Class representing vehicle on the map
+ */
+public class Vehicle implements Drawable {
     private Coordinates position;
     private TimetableEntry startEntry;
     private Line line;
@@ -29,6 +25,12 @@ public class Vehicle extends GuiElement {
     private Path path;
     private List<Shape> gui;
 
+    /**
+     * Constructor for vehicle
+     * @param line Vehicle drive line
+     * @param startEntry Vehicle starting point
+     * @param timetable Vehicle timetable
+     */
     public Vehicle(Line line, TimetableEntry startEntry, Timetable timetable) {
         this.position = startEntry.getStop().getCoordinates();
         this.timetable = timetable;
@@ -43,10 +45,19 @@ public class Vehicle extends GuiElement {
         gui.add(text);
     }
 
+    /**
+     * Returns vehicle line
+     * @return vehicle line
+     */
     public Line getLine() {
         return line;
     }
 
+    /**
+     * Moves vehicle indicator by specific coordinates
+     * @param x x move amount
+     * @param y y move amount
+     */
     private void moveGuiPoint(double x, double y) {
         for (Shape shape : gui) {
             shape.translateXProperty().setValue(x + shape.getTranslateX());
@@ -54,6 +65,11 @@ public class Vehicle extends GuiElement {
         }
     }
 
+    /**
+     * Updates vehicle position according to time and its timetable
+     * @param streets list of map streets
+     * @param time current time
+     */
     public void drive(List<Street> streets, LocalTime time) {
         if(nextEntry == null) {
             this.nextEntry = timetable.getNextEntry(time);
@@ -82,7 +98,7 @@ public class Vehicle extends GuiElement {
                     }
                 }
             }
-
+            //Calculates vehicle completion of path to next stop. Value from intrerval 0-1
             double drivenPart =  (time.toNanoOfDay() - startEntry.getTime().toNanoOfDay()) / (double)(nextEntry.getTime().toNanoOfDay() - startEntry.getTime().toNanoOfDay());
             double distance = path.getPathLenght() * drivenPart;
             if(distance <= 0) {
@@ -95,6 +111,10 @@ public class Vehicle extends GuiElement {
         }
     }
 
+    /**
+     * Sets listener on vehicle click
+     * @param listener Vehicle click listener
+     */
     public void setOnSelectListener(OnVehicleSelectListener listener) {
         for (Shape shape :
                 gui) {
@@ -115,7 +135,14 @@ public class Vehicle extends GuiElement {
         return gui;
     }
 
+    /**
+     * Interface for handling vehicle clicks
+     */
     public interface OnVehicleSelectListener {
+        /**
+         * Is fired when vehicle is selected
+         * @param vehicle selected vehicle
+         */
         void vehicleSelect(Vehicle vehicle);
     }
 }
