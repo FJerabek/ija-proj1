@@ -2,19 +2,35 @@ package vut.fit.ija.proj1.data;
 
 import java.util.Objects;
 
+/**
+ * Represents coordinates on map
+ */
 public class Coordinates {
     private double x;
     private double y;
 
+    /**
+     * Creates a new coordinates on specified possition
+     * @param x X coordinate
+     * @param y Y coordinate
+     */
     public Coordinates(double x, double y) {
         this.x = x;
         this.y = y;
     }
 
+    /**
+     * Returns X coordinate
+     * @return x coordinate
+     */
     public double getX() {
         return x;
     }
 
+    /**
+     * Returns Y coordinate
+     * @return Y coordinate
+     */
     public double getY() {
         return y;
     }

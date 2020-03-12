@@ -7,17 +7,25 @@ import vut.fit.ija.proj1.gui.elements.Street;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class representing path in the map
+ */
 public class Path {
     private List<Coordinates> path;
 
+    /**
+     * Constructs a new path
+     * @param path list of path coordinates
+     */
     public Path(List<Coordinates> path) {
         this.path = path;
     }
 
-    public List<Coordinates> getPath() {
-        return path;
-    }
-
+    /**
+     * Returns a coordinates on path at set distance
+     * @param distance distance
+     * @return coordinates on path at set distance
+     */
     public Coordinates getCoordinatesByDistance(double distance) {
         if(path.size() == 1) {
             return path.get(0);
@@ -45,6 +53,10 @@ public class Path {
         return new Coordinates(a.getX() + (b.getX() - a.getX())*driven, a.getY() + (b.getY() - a.getY())*driven);
     }
 
+    /**
+     * Returns path as shape on map
+     * @return shape on map
+     */
     public Shape getShape() {
         Shape shape = null;
         for (int i = 0; i < path.size() - 1; i++) {
@@ -63,6 +75,10 @@ public class Path {
         return shape;
     }
 
+    /**
+     * Calculates the path length
+     * @return path length
+     */
     public double getPathLenght() {
         double length = 0;
         for (int i = 0; i < path.size() - 1; i++) {
@@ -73,7 +89,13 @@ public class Path {
         return length;
     }
 
-    public static List<Coordinates> getNeighbors(Coordinates coords, List<Street> streets) {
+    /**
+     * Returns neighboring streets by specifying street and coordinates of street end
+     * @param coords street end coordinates
+     * @param streets street to find neighbors to
+     * @return street neighbors
+     */
+    private static List<Coordinates> getNeighbors(Coordinates coords, List<Street> streets) {
         List<Coordinates> neighbors = new ArrayList<>();
         for(Street street : streets) {
             if((street.getFrom().equals(coords) || street.getTo().equals(coords))) {
@@ -86,11 +108,27 @@ public class Path {
         return neighbors;
     }
 
+    /**
+     * Returns path from and to specified coordinates Coordinates must be one of the ends of street or
+     * stop on any of these streets.
+     * @param from From coordinates
+     * @param to To coordinates
+     * @param streets all streets
+     * @return path between from and to coordinates;
+     */
     public static Path getPath(Coordinates from, Coordinates to,List<Street> streets) {
         class PathInfo {
+            /**
+             *
+             */
             List<Coordinates> path;
             Coordinates coords;
 
+            /**
+             * Path info constructor
+             * @param path path as series of coordinates
+             * @param coords current coordinates
+             */
             PathInfo(List<Coordinates> path, Coordinates coords) {
                 this.path = path;
                 this.coords = coords;

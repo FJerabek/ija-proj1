@@ -3,23 +3,19 @@ package vut.fit.ija.proj1.gui;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.Group;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
-import javafx.util.converter.LocalTimeStringConverter;
 import vut.fit.ija.proj1.data.*;
-import vut.fit.ija.proj1.gui.elements.GuiElement;
+import vut.fit.ija.proj1.gui.elements.Drawable;
 import vut.fit.ija.proj1.gui.elements.Stop;
 import vut.fit.ija.proj1.gui.elements.Street;
+import vut.fit.ija.proj1.gui.elements.Vehicle;
 
-import java.sql.Time;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -69,10 +65,10 @@ public class MainController {
             new Vehicle(
                     new vut.fit.ija.proj1.data.Line(
                             new ArrayList<>(Arrays.asList(
+                                    stops.get(0),
                                     stops.get(1),
-                                    stops.get(2),
                                     stops.get(3),
-                                    stops.get(4),
+                                    stops.get(2),
                                     stops.get(5)
                             )),
                             "1"
@@ -80,12 +76,11 @@ public class MainController {
                     new TimetableEntry(stops.get(0), LocalTime.now()),
                     new Timetable(
                             Arrays.asList(
-                                    new TimetableEntry(stops.get(1), LocalTime.now().plusSeconds(20)),
-                                    new TimetableEntry(stops.get(2), LocalTime.now().plusSeconds(30)),
+                                    new TimetableEntry(stops.get(0), LocalTime.now().plusSeconds(20)),
+                                    new TimetableEntry(stops.get(1), LocalTime.now().plusSeconds(30)),
                                     new TimetableEntry(stops.get(3), LocalTime.now().plusSeconds(60)),
-                                    new TimetableEntry(stops.get(4), LocalTime.now().plusSeconds(80)),
-                                    new TimetableEntry(stops.get(4), LocalTime.now().plusSeconds(100)),
-                                    new TimetableEntry(stops.get(5), LocalTime.now().plusSeconds(120))
+                                    new TimetableEntry(stops.get(2), LocalTime.now().plusSeconds(80)),
+                                    new TimetableEntry(stops.get(5), LocalTime.now().plusSeconds(100))
                             )
                     )
             ),
@@ -196,13 +191,13 @@ public class MainController {
             content.getChildren().add(line);
         }
 
-        List<GuiElement> elements = new ArrayList<>();
+        List<Drawable> elements = new ArrayList<>();
 
         elements.addAll(streets);
         elements.addAll(stops);
         elements.addAll(vehicles);
 
-        for (GuiElement element : elements) {
+        for (Drawable element : elements) {
             content.getChildren().addAll(element.draw());
         }
 
@@ -229,7 +224,7 @@ public class MainController {
                 }
 
                 if (shape != null) {
-                    shape.setFill(Color.AQUAMARINE);
+                    shape.setFill(Color.FORESTGREEN);
                 }
                 selectedShape = shape;
                 content.getChildren().add(shape);
