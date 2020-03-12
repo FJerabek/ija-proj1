@@ -15,14 +15,23 @@ import vut.fit.ija.proj1.gui.MainController;
 import vut.fit.ija.proj1.gui.elements.Stop;
 import vut.fit.ija.proj1.gui.elements.Street;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Represents main application
+ */
 public class MainApplication extends Application {
 
+    /**
+     * Starts main GUI of the application
+     * @param primaryStage Primary stage of the application
+     * @throws IOException When loading of the layout fails
+     */
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) throws IOException {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("/main_layout.fxml"));
         Parent root = loader.load();
@@ -45,7 +54,7 @@ public class MainApplication extends Application {
         });
 //        Load map and timetables
     }
-
+    
     public static void main(String[] args) {
         launch(args);
     }
