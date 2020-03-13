@@ -1,5 +1,6 @@
 package vut.fit.ija.proj1.gui.elements;
 
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
@@ -10,15 +11,15 @@ import vut.fit.ija.proj1.data.*;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Class representing vehicle on the map
  */
 public class Vehicle implements Drawable {
     private Coordinates position;
-    private TimetableEntry startEntry;
+    private TimetableEntry currentStop;
     private Line line;
     private Timetable timetable;
     private TimetableEntry nextEntry;
@@ -35,7 +36,7 @@ public class Vehicle implements Drawable {
         this.position = startEntry.getStop().getCoordinates();
         this.timetable = timetable;
         this.line = line;
-        this.startEntry = startEntry;
+        this.currentStop = startEntry;
 
         Circle circle = new Circle(position.getX(), position.getY(), 7, Color.BLUE);
         Text text = new Text(position.getX() + 7, position.getY() + 4, line.getName());
@@ -67,48 +68,52 @@ public class Vehicle implements Drawable {
 
     /**
      * Updates vehicle position according to time and its timetable
-     * @param streets list of map streets
      * @param time current time
      */
-    public void drive(List<Street> streets, LocalTime time) {
+    public void drive(LocalTime time, Pane pane) {
         if(nextEntry == null) {
-            this.nextEntry = timetable.getNextEntry(time);
+            nextEntry = timetable.getNextEntry(time);
             if(nextEntry == null) {
                 return;
             }
         }
-        if(path == null) {
-            path = Path.getPath(position, nextEntry.getStop().getCoordinates(), streets);
-        }
-
-        if(path != null) {
-            if(nextEntry.getTime().isBefore(time)) {
-                moveGuiPoint(nextEntry.getStop().getCoordinates().getX() - position.getX(), nextEntry.getStop().getCoordinates().getY() - position.getY());
-                position = nextEntry.getStop().getCoordinates();
-                startEntry = nextEntry;
-                nextEntry = timetable.getNextEntry(time);
-                if (nextEntry == null) {
-                    moveGuiPoint(startEntry.getStop().getCoordinates().getX() - position.getX(), startEntry.getStop().getCoordinates().getY() - position.getY());
-                    return;
-                } else {
-                    if(nextEntry.getStop().getCoordinates().equals(position)){
-                        path = new Path(Collections.singletonList(position));
-                    } else {
-                        path = Path.getPath(startEntry.getStop().getCoordinates(), nextEntry.getStop().getCoordinates(), streets);
-                    }
-                }
-            }
-            //Calculates vehicle completion of path to next stop. Value from intrerval 0-1
-            double drivenPart =  (time.toNanoOfDay() - startEntry.getTime().toNanoOfDay()) / (double)(nextEntry.getTime().toNanoOfDay() - startEntry.getTime().toNanoOfDay());
-            double distance = path.getPathLenght() * drivenPart;
-            if(distance <= 0) {
+        if(time.isAfter(nextEntry.getTime())) {
+            currentStop = nextEntry;
+            nextEntry = timetable.getNextEntry(time);
+            if(nextEntry == null) {
+                System.out.println(String.format("Vehicle on line: \"%s\" has nowhere to go.", getLine().toString()));
+                moveGuiPoint(currentStop.getStop().getCoordinates().getX() - position.getX(), currentStop.getStop().getCoordinates().getY() - position.getY());
                 return;
             }
-            Coordinates coords = path.getCoordinatesByDistance(distance);
-
-            moveGuiPoint(coords.getX() - position.getX(), coords.getY() - position.getY());
-            position = coords;
+            System.out.println(nextEntry);
+            path = line.getPathToNextStop(currentStop.getStop());
+            if(path != null)
+                pane.getChildren().add(path.getShape());
+            else
+                System.out.println("Path is null");
         }
+
+        if(currentStop != null && nextEntry != null) {
+            if (Objects.equals(currentStop.getStop(), nextEntry.getStop())) {
+                return;
+            }
+        } else {
+            return;
+        }
+
+        if(path == null) {
+            path = line.getPathToNextStop(currentStop.getStop());
+            if(path == null) {
+                return;
+            }
+        }
+        double drivenPart =  (time.toNanoOfDay() - currentStop.getTime().toNanoOfDay()) / (double)(nextEntry.getTime().toNanoOfDay() - currentStop.getTime().toNanoOfDay());
+        System.out.println(drivenPart);
+        double distance = path.getPathLenght() * drivenPart;
+        Coordinates coords = path.getCoordinatesByDistance(distance);
+        pane.getChildren().add(new Circle(coords.getX(), coords.getY(), 2, Color.GREEN));
+        moveGuiPoint(coords.getX() - position.getX(), coords.getY() - position.getY());
+        position = coords;
     }
 
     /**

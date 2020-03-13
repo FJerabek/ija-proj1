@@ -2,6 +2,7 @@ package vut.fit.ija.proj1.data;
 
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
+import vut.fit.ija.proj1.gui.elements.Stop;
 import vut.fit.ija.proj1.gui.elements.Street;
 
 import java.util.ArrayList;
@@ -62,6 +63,7 @@ public class Path {
         for (int i = 0; i < path.size() - 1; i++) {
             Coordinates a = path.get(i);
             Coordinates b = path.get(i+1);
+
             if(shape == null) {
                 Line line = new Line(a.getX(), a.getY(), b.getX(), b.getY());
                 line.setStrokeWidth(3);
@@ -88,88 +90,24 @@ public class Path {
         }
         return length;
     }
-
-    /**
-     * Returns neighboring streets by specifying street and coordinates of street end
-     * @param coords street end coordinates
-     * @param streets street to find neighbors to
-     * @return street neighbors
-     */
-    private static List<Coordinates> getNeighbors(Coordinates coords, List<Street> streets) {
-        List<Coordinates> neighbors = new ArrayList<>();
-        for(Street street : streets) {
-            if((street.getFrom().equals(coords) || street.getTo().equals(coords))) {
-                Coordinates nextCoords = street.getFrom().equals(coords)? street.getTo() : street.getFrom();
-                if(!neighbors.contains(nextCoords)) {
-                    neighbors.add(nextCoords);
-                }
-            }
-        }
-        return neighbors;
+    private static Coordinates getNextCoordinates(Coordinates current, Street nextStreet) {
+        return nextStreet.getFrom().equals(current)? nextStreet.getTo() : nextStreet.getFrom();
     }
 
     /**
-     * Returns path from and to specified coordinates Coordinates must be one of the ends of street or
-     * stop on any of these streets.
-     * @param from From coordinates
-     * @param to To coordinates
-     * @param streets all streets
-     * @return path between from and to coordinates;
+     * Returns stop if there is a stop on specified coordinates, null otherwise;
+     * @param coordinates stop coordinates
+     * @param streets all streets on map
+     * @return stop if there is a stop, null otherwise
      */
-    public static Path getPath(Coordinates from, Coordinates to,List<Street> streets) {
-        class PathInfo {
-            /**
-             *
-             */
-            List<Coordinates> path;
-            Coordinates coords;
-
-            /**
-             * Path info constructor
-             * @param path path as series of coordinates
-             * @param coords current coordinates
-             */
-            PathInfo(List<Coordinates> path, Coordinates coords) {
-                this.path = path;
-                this.coords = coords;
-            }
-        }
-
-        List<PathInfo> found = new ArrayList<>();
-        List<Coordinates> processed = new ArrayList<>();
-
-        List<PathInfo> open = new ArrayList<>();
-        open.add(new PathInfo(new ArrayList<>(), from));
-
-        for (int i = 0; i < open.size(); i++) {
-            PathInfo info = open.get(i);
-            List<Coordinates> neighbors = getNeighbors(info.coords, streets);
-            for (Coordinates in : neighbors) {
-                if (!processed.contains(in)) {
-                    processed.add(in);
-                    List<Coordinates> path = new ArrayList<>(info.path);
-                    path.add(info.coords);
-                    PathInfo pathInfo = new PathInfo(path, in);
-                    open.add(pathInfo);
-                    if (in.equals(to)) {
-                        found.add(pathInfo);
-                    }
+    private static Stop getStopByCoordinates(Coordinates coordinates, List<Street> streets) {
+        for(Street street : streets) {
+            for(Stop stop : street.getStops()) {
+                if (stop.getCoordinates().equals(coordinates)) {
+                    return stop;
                 }
             }
         }
-        PathInfo closest = null;
-        for (PathInfo info : found) {
-            if(closest == null) {
-                closest = info;
-            } else {
-                if(info.path.size() < closest.path.size()) {
-                    closest = info;
-                }
-            }
-        }
-        if(closest != null) {
-            closest.path.add(closest.coords);
-        }
-        return closest != null? new Path(closest.path) : null;
+        return null;
     }
 }
