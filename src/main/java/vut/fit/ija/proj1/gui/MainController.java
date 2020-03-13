@@ -127,11 +127,11 @@ public class MainController {
                 new TimetableEntry(stops.get(0), LocalTime.now()),
                 new Timetable(
                         Arrays.asList(
-                                new TimetableEntry(lines.get(0).getStops().get(0), LocalTime.now().plusSeconds(10)),
-                                new TimetableEntry(lines.get(0).getStops().get(1), LocalTime.now().plusSeconds(20)),
-                                new TimetableEntry(lines.get(0).getStops().get(2), LocalTime.now().plusSeconds(30)),
-                                new TimetableEntry(lines.get(0).getStops().get(3), LocalTime.now().plusSeconds(40)),
-                                new TimetableEntry(lines.get(0).getStops().get(4), LocalTime.now().plusSeconds(50))
+                                new TimetableEntry(lines.get(0).getStops().get(0), LocalTime.now().plusMinutes(10)),
+                                new TimetableEntry(lines.get(0).getStops().get(1), LocalTime.now().plusMinutes(20)),
+                                new TimetableEntry(lines.get(0).getStops().get(2), LocalTime.now().plusMinutes(30)),
+                                new TimetableEntry(lines.get(0).getStops().get(3), LocalTime.now().plusMinutes(40)),
+                                new TimetableEntry(lines.get(0).getStops().get(4), LocalTime.now().plusMinutes(50))
                         )
                 )
         ));

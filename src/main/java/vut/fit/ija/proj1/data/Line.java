@@ -177,9 +177,10 @@ public class Line {
 
     public Shape getGui() {
         Shape shape = null;
-        for(Stop stop : stops) {
+        for (int i = 0; i < stops.size() - 1; i++) {
+            Stop stop = stops.get(i);
             Path path = getPathToNextStop(stop);
-            if(shape == null) {
+            if (shape == null) {
                 shape = path.getShape();
             } else {
                 shape = Shape.union(shape, path.getShape());

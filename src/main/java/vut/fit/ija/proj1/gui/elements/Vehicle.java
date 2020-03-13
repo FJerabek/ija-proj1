@@ -85,12 +85,7 @@ public class Vehicle implements Drawable {
                 moveGuiPoint(currentStop.getStop().getCoordinates().getX() - position.getX(), currentStop.getStop().getCoordinates().getY() - position.getY());
                 return;
             }
-            System.out.println(nextEntry);
             path = line.getPathToNextStop(currentStop.getStop());
-            if(path != null)
-                pane.getChildren().add(path.getShape());
-            else
-                System.out.println("Path is null");
         }
 
         if(currentStop != null && nextEntry != null) {
@@ -108,10 +103,8 @@ public class Vehicle implements Drawable {
             }
         }
         double drivenPart =  (time.toNanoOfDay() - currentStop.getTime().toNanoOfDay()) / (double)(nextEntry.getTime().toNanoOfDay() - currentStop.getTime().toNanoOfDay());
-        System.out.println(drivenPart);
         double distance = path.getPathLenght() * drivenPart;
         Coordinates coords = path.getCoordinatesByDistance(distance);
-        pane.getChildren().add(new Circle(coords.getX(), coords.getY(), 2, Color.GREEN));
         moveGuiPoint(coords.getX() - position.getX(), coords.getY() - position.getY());
         position = coords;
     }
