@@ -37,7 +37,8 @@ public class MainController {
             new Stop("Stop4", new Coordinates(242, 193)),
             new Stop("Stop5", new Coordinates(700, 500)),
             new Stop("Stop6", new Coordinates(860, 250)),
-            new Stop("Stop7", new Coordinates(600, 350))
+            new Stop("Stop7", new Coordinates(600, 350)),
+            new Stop("Stop8", new Coordinates(600, 400))
             ));
 
     private List<Street> streets = new ArrayList<>(Arrays.asList(
@@ -45,7 +46,7 @@ public class MainController {
             new Street("Street 2", new Coordinates(475, 444), new Coordinates(242, 193), Arrays.asList(stops.get(0), stops.get(3))),
             new Street("Street 3", new Coordinates(339, 689), new Coordinates(242, 193), Arrays.asList(stops.get(1), stops.get(3))),
             new Street("Street 4", new Coordinates(475, 444), new Coordinates(600, 444), Collections.singletonList(stops.get(0))),
-            new Street("Street 5", new Coordinates(600, 444), new Coordinates(600, 200), Arrays.asList(stops.get(2), stops.get(6))),
+            new Street("Street 5", new Coordinates(600, 444), new Coordinates(600, 200), Arrays.asList(stops.get(2), stops.get(6), stops.get(7))),
             new Street("Street 6", new Coordinates(600, 200), new Coordinates(300, 100), Collections.singletonList(stops.get(2))),
             new Street("Street 7", new Coordinates(300, 100), new Coordinates(242, 193), Collections.singletonList(stops.get(3))),
             new Street("Street 8", new Coordinates(339, 689), new Coordinates(850, 800), Collections.singletonList(stops.get(1))),
@@ -62,7 +63,8 @@ public class MainController {
                             stops.get(0),
                             stops.get(3),
                             stops.get(2),
-                            stops.get(6)
+                            stops.get(6),
+                            stops.get(7)
                     ),
                     Arrays.asList(
                             streets.get(1),
@@ -128,7 +130,8 @@ public class MainController {
                                 new TimetableEntry(lines.get(0).getStops().get(0), LocalTime.now().plusSeconds(10)),
                                 new TimetableEntry(lines.get(0).getStops().get(1), LocalTime.now().plusSeconds(20)),
                                 new TimetableEntry(lines.get(0).getStops().get(2), LocalTime.now().plusSeconds(30)),
-                                new TimetableEntry(lines.get(0).getStops().get(3), LocalTime.now().plusSeconds(40))
+                                new TimetableEntry(lines.get(0).getStops().get(3), LocalTime.now().plusSeconds(40)),
+                                new TimetableEntry(lines.get(0).getStops().get(4), LocalTime.now().plusSeconds(50))
                         )
                 )
         ));
