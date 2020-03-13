@@ -1,5 +1,11 @@
 package vut.fit.ija.proj1.gui.elements;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.util.StdConverter;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -17,14 +23,24 @@ import java.util.Objects;
 /**
  * Class representing vehicle on the map
  */
+@JsonDeserialize(converter=Vehicle.VehicleSanitizer.class)
+@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
 public class Vehicle implements Drawable {
+    @JsonIgnore
     private Coordinates position;
+    @JsonProperty("startingStop")
     private TimetableEntry currentStop;
     private Line line;
     private Timetable timetable;
+    @JsonIgnore
     private TimetableEntry nextEntry;
+    @JsonIgnore
     private Path path;
+    @JsonIgnore
     private List<Shape> gui;
+
+    public Vehicle() {
+    }
 
     /**
      * Constructor for vehicle
@@ -44,6 +60,24 @@ public class Vehicle implements Drawable {
         gui = new ArrayList<>();
         gui.add(circle);
         gui.add(text);
+    }
+
+    private void postConstruct() {
+        this.position = currentStop.getStop().getCoordinates();
+        Circle circle = new Circle(position.getX(), position.getY(), 7, Color.BLUE);
+        Text text = new Text(position.getX() + 7, position.getY() + 4, line.getName());
+        text.setFont(Font.font(text.getFont().getFamily(), FontWeight.BOLD, 15));
+        gui = new ArrayList<>();
+        gui.add(circle);
+        gui.add(text);
+    }
+
+    public TimetableEntry getCurrentStop() {
+        return currentStop;
+    }
+
+    public Timetable getTimetable() {
+        return timetable;
     }
 
     /**
@@ -124,6 +158,7 @@ public class Vehicle implements Drawable {
     }
 
     @Override
+    @JsonIgnore
     public Coordinates getCoordinates() {
         return position;
     }
@@ -142,5 +177,13 @@ public class Vehicle implements Drawable {
          * @param vehicle selected vehicle
          */
         void vehicleSelect(Vehicle vehicle);
+    }
+
+    public static class VehicleSanitizer extends StdConverter<Vehicle,Vehicle> {
+        @Override
+        public Vehicle convert(Vehicle vehicle) {
+            vehicle.postConstruct();
+            return vehicle;
+        }
     }
 }

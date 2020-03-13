@@ -1,5 +1,9 @@
 package vut.fit.ija.proj1.data;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import vut.fit.ija.proj1.gui.elements.Stop;
 
 import java.time.LocalTime;
@@ -8,9 +12,13 @@ import java.util.Objects;
 /**
  * Class representing single timetable entry
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.None.class)
 public class TimetableEntry {
     private Stop stop;
     private LocalTime time;
+
+    public TimetableEntry() {
+    }
 
     /**
      * Timietable entry constructor

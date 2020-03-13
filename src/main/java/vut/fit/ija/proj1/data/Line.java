@@ -1,19 +1,31 @@
 package vut.fit.ija.proj1.data;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
 import vut.fit.ija.proj1.gui.elements.Stop;
 import vut.fit.ija.proj1.gui.elements.Street;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a line that vehicle takes
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
 public class Line {
     private List<Stop> stops;
     private String name;
+    @JsonProperty("streets")
     private List<Street> path;
+
+    public Line() {
+    }
 
     /**
      * Creates a line with specified name and stop plan
@@ -26,6 +38,7 @@ public class Line {
         this.path = path;
     }
 
+    @JsonIgnore
     private Street getStopStreet(Stop stop) {
         for(Street street : path) {
             if(street.getStops().contains(stop)) {
@@ -40,6 +53,7 @@ public class Line {
      * @param coords street end coordinates
      * @return street neighbors
      */
+    @JsonIgnore
     private List<Street> getNeighbors(Coordinates coords) {
         List<Street> neighbors = new ArrayList<>();
         for(Street street : path) {
@@ -52,6 +66,7 @@ public class Line {
         return neighbors;
     }
 
+    @JsonIgnore
     private List<Street> getNeighbors(Street street) {
         HashSet<Street> neighbors = new HashSet<>();
         neighbors.addAll(getNeighbors(street.getTo()));
@@ -65,6 +80,7 @@ public class Line {
      * @param currentStop Current stop
      * @return path to the next stop on this line
      */
+    @JsonIgnore
     public Path getPathToNextStop(Stop currentStop) {
         class PathInfo {
             protected List<Coordinates> path;
@@ -95,8 +111,8 @@ public class Line {
         HashSet<PathInfo> found = new HashSet<>();
 
         int nextStopIndex = stops.indexOf(currentStop) + 1;
-        if(nextStopIndex >= stops.size()){
-            return null;
+        if(nextStopIndex >= stops.size()) {
+            nextStopIndex %= stops.size();
         }
         Stop nextStop = stops.get(nextStopIndex);
         Street nextStopStreet = getStopStreet(nextStop);
@@ -175,6 +191,11 @@ public class Line {
         return name;
     }
 
+    public List<Street> getPath() {
+        return path;
+    }
+
+    @JsonIgnore
     public Shape getGui() {
         Shape shape = null;
         for (int i = 0; i < stops.size() - 1; i++) {

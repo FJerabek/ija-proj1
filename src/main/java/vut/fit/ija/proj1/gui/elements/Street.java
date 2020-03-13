@@ -1,5 +1,8 @@
 package vut.fit.ija.proj1.gui.elements;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
@@ -13,11 +16,15 @@ import java.util.Objects;
 /**
  * Class representing single street on map
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
 public class Street implements Drawable {
     private String name;
     private List<Stop> stops;
     private Coordinates from;
     private Coordinates to;
+
+    public Street() {
+    }
 
     /**
      * Street constructor
@@ -33,6 +40,7 @@ public class Street implements Drawable {
         this.stops = stops;
     }
 
+    @JsonIgnore
     @Override
     public Coordinates getCoordinates() {
         return new Coordinates((from.getX() + to.getX()) / 2, (from.getY() + to.getY()) / 2);

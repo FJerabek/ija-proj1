@@ -1,5 +1,7 @@
 package vut.fit.ija.proj1.gui.elements;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
@@ -13,9 +15,13 @@ import java.util.Objects;
 /**
  * Class representing single stop on map
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
 public class Stop implements Drawable {
     private String id;
     private Coordinates coordinates;
+
+    public Stop() {
+    }
 
     /**
      * Stop constructor
@@ -58,7 +64,6 @@ public class Stop implements Drawable {
     @Override
     public int hashCode() {
         return Objects.hash(id);
-
     }
 
     @Override

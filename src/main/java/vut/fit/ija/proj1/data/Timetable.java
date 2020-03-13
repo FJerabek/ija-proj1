@@ -1,5 +1,8 @@
 package vut.fit.ija.proj1.data;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import vut.fit.ija.proj1.gui.elements.Stop;
 
 import java.time.LocalTime;
@@ -8,9 +11,13 @@ import java.util.List;
 /**
  * Class representing timetable
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.None.class)
 public class Timetable {
     private List<TimetableEntry> entries;
     private int i = 0;
+
+    public Timetable() {
+    }
 
     /**
      * Timetable constructor
@@ -34,6 +41,7 @@ public class Timetable {
      * @param currentTime current time
      * @return next timetable entry
      */
+    @JsonIgnore
     public TimetableEntry getNextEntry(LocalTime currentTime) {
         TimetableEntry next = null;
         for (TimetableEntry entry : entries) {
