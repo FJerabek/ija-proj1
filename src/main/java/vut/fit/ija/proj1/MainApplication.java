@@ -40,14 +40,6 @@ public class MainApplication extends Application {
         primaryStage.setTitle("IJA Projekt");
         primaryStage.show();
 
-        List<Street> streets = loader.<MainController>getController().getStreets();
-        Path path = Path.getPath(new Coordinates(475,444), new Coordinates(850, 800), streets);
-        if(path != null) {
-            System.out.println((path.getPathLenght()));
-        }
-        path = new Path(Arrays.asList(new Coordinates(0,0), new Coordinates(10 ,10), new Coordinates(15, 10)));
-        System.out.println(path.getCoordinatesByDistance(19.145));
-
         primaryStage.setOnCloseRequest(e -> {
             Platform.exit();
             System.exit(0);

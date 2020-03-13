@@ -16,26 +16,15 @@ import java.util.Objects;
 public class Stop implements Drawable {
     private String id;
     private Coordinates coordinates;
-    private Street street;
 
     /**
      * Stop constructor
      * @param id stop id/name
      * @param coordinates stop coordinates
-     * @param street stop street
      */
-    public Stop(String id, Coordinates coordinates, Street street) {
+    public Stop(String id, Coordinates coordinates) {
         this.id = id;
         this.coordinates = coordinates;
-        this.street = street;
-    }
-
-    /**
-     * Returns stop street
-     * @return street
-     */
-    public Street getStreet() {
-        return street;
     }
 
     /**
@@ -58,7 +47,6 @@ public class Stop implements Drawable {
         return Arrays.asList(text, circle);
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -75,6 +63,6 @@ public class Stop implements Drawable {
 
     @Override
     public String toString() {
-        return String.format("%s \t %s", id, street.toString());
+        return String.format("%s", id);
     }
 }

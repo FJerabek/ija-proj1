@@ -3,12 +3,15 @@ package vut.fit.ija.proj1.gui;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
 import vut.fit.ija.proj1.data.*;
 import vut.fit.ija.proj1.gui.elements.Drawable;
@@ -21,88 +24,53 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class MainController {
-    private LocalTime localTime = LocalTime.now();
+    private LocalTime localTime;
     private Timer timer;
     private Shape selectedShape;
-    private TimerTask vehicleUpdate = new TimerTask() {
-        @Override
-        public void run() {
-            Platform.runLater(() -> {
-                localTime = localTime.plusNanos(1000000000);
-                time.setText(localTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")));
-                for (Vehicle vehicle : vehicles) {
-                    vehicle.drive(streets, localTime);
-                }
-            });
-        }
-    };
-
-    private List<Street> streets = new ArrayList<>(Arrays.asList(
-            new Street("Street 1", new Coordinates(475, 444), new Coordinates(339, 689)),
-            new Street("Street 2", new Coordinates(475, 444), new Coordinates(242, 193)),
-            new Street("Street 3", new Coordinates(339, 689), new Coordinates(242, 193)),
-            new Street("Street 4", new Coordinates(475, 444), new Coordinates(600, 444)),
-            new Street("Street 5", new Coordinates(600, 444), new Coordinates(600, 200)),
-            new Street("Street 6", new Coordinates(600, 200), new Coordinates(300, 100)),
-            new Street("Street 7", new Coordinates(300, 100), new Coordinates(242, 193)),
-            new Street("Street 8", new Coordinates(339, 689), new Coordinates(850, 800)),
-            new Street("Street 9", new Coordinates(850, 800), new Coordinates(700, 500)),
-            new Street("Street 10", new Coordinates(700, 500), new Coordinates(600, 444)),
-            new Street("Street 11", new Coordinates(700, 500), new Coordinates(860, 250)),
-            new Street("Street 12", new Coordinates(860, 250), new Coordinates(600, 200))
-    ));
+    private Paint[] paint = new Paint[]{Color.AQUA,Color.BLUEVIOLET, Color.CADETBLUE, Color.DARKOLIVEGREEN, Color.DARKORANGE, Color.DEEPPINK, Color.GOLD};
+    private int index = 0;
 
     private List<Stop> stops = new ArrayList<>(Arrays.asList(
-            new Stop("Stop1", new Coordinates(475, 444), streets.get(0)),
-            new Stop("Stop2", new Coordinates(339, 689), streets.get(2)),
-            new Stop("Stop3", new Coordinates(600, 200), streets.get(4)),
-            new Stop("Stop4", new Coordinates(242, 193), streets.get(6)),
-            new Stop("Stop5", new Coordinates(700, 500), streets.get(9)),
-            new Stop("Stop6", new Coordinates(860, 250), streets.get(10))
-    ));
+            new Stop("Stop1", new Coordinates(475, 444)),
+            new Stop("Stop2", new Coordinates(339, 689)),
+            new Stop("Stop3", new Coordinates(600, 200)),
+            new Stop("Stop4", new Coordinates(242, 193)),
+            new Stop("Stop5", new Coordinates(700, 500)),
+            new Stop("Stop6", new Coordinates(860, 250)),
+            new Stop("Stop7", new Coordinates(600, 350))
+            ));
 
-    private List<Vehicle> vehicles = new ArrayList<>(Arrays.asList(
-            new Vehicle(
-                    new vut.fit.ija.proj1.data.Line(
-                            new ArrayList<>(Arrays.asList(
-                                    stops.get(0),
-                                    stops.get(1),
-                                    stops.get(3),
-                                    stops.get(2),
-                                    stops.get(5)
-                            )),
-                            "1"
+    private List<Street> streets = new ArrayList<>(Arrays.asList(
+            new Street("Street 1", new Coordinates(475, 444), new Coordinates(339, 689), Arrays.asList(stops.get(0), stops.get(1))),
+            new Street("Street 2", new Coordinates(475, 444), new Coordinates(242, 193), Arrays.asList(stops.get(0), stops.get(3))),
+            new Street("Street 3", new Coordinates(339, 689), new Coordinates(242, 193), Arrays.asList(stops.get(1), stops.get(3))),
+            new Street("Street 4", new Coordinates(475, 444), new Coordinates(600, 444), Collections.singletonList(stops.get(0))),
+            new Street("Street 5", new Coordinates(600, 444), new Coordinates(600, 200), Arrays.asList(stops.get(2), stops.get(6))),
+            new Street("Street 6", new Coordinates(600, 200), new Coordinates(300, 100), Collections.singletonList(stops.get(2))),
+            new Street("Street 7", new Coordinates(300, 100), new Coordinates(242, 193), Collections.singletonList(stops.get(3))),
+            new Street("Street 8", new Coordinates(339, 689), new Coordinates(850, 800), Collections.singletonList(stops.get(1))),
+            new Street("Street 9", new Coordinates(850, 800), new Coordinates(700, 500), Collections.singletonList(stops.get(4))),
+            new Street("Street 10", new Coordinates(700, 500), new Coordinates(600, 444), Collections.singletonList(stops.get(4))),
+            new Street("Street 11", new Coordinates(700, 500), new Coordinates(860, 250), Arrays.asList(stops.get(4), stops.get(5))),
+            new Street("Street 12", new Coordinates(860, 250), new Coordinates(600, 200), Arrays.asList(stops.get(5), stops.get(2)))
+    ));
+    private List<Vehicle> vehicles = new ArrayList<>();
+
+    private List<Line> lines = new ArrayList<>(Arrays.asList(
+            new Line(
+                    Arrays.asList(
+                            stops.get(0),
+                            stops.get(3),
+                            stops.get(2),
+                            stops.get(6)
                     ),
-                    new TimetableEntry(stops.get(0), LocalTime.now()),
-                    new Timetable(
-                            Arrays.asList(
-                                    new TimetableEntry(stops.get(0), LocalTime.now().plusSeconds(20)),
-                                    new TimetableEntry(stops.get(1), LocalTime.now().plusSeconds(30)),
-                                    new TimetableEntry(stops.get(3), LocalTime.now().plusSeconds(60)),
-                                    new TimetableEntry(stops.get(2), LocalTime.now().plusSeconds(80)),
-                                    new TimetableEntry(stops.get(5), LocalTime.now().plusSeconds(100))
-                            )
-                    )
-            ),
-            new Vehicle(
-                    new vut.fit.ija.proj1.data.Line(
-                            new ArrayList<>(Arrays.asList(
-                                    stops.get(1),
-                                    stops.get(3),
-                                    stops.get(2),
-                                    stops.get(4)
-                            )),
-                            "2"
+                    Arrays.asList(
+                            streets.get(1),
+                            streets.get(6),
+                            streets.get(5),
+                            streets.get(4)
                     ),
-                    new TimetableEntry(stops.get(4), LocalTime.now()),
-                    new Timetable(
-                            Arrays.asList(
-                                    new TimetableEntry(stops.get(1), LocalTime.now().plusSeconds(20)),
-                                    new TimetableEntry(stops.get(3), LocalTime.now().plusSeconds(30)),
-                                    new TimetableEntry(stops.get(2), LocalTime.now().plusSeconds(60)),
-                                    new TimetableEntry(stops.get(4), LocalTime.now().plusSeconds(80))
-                            )
-                    )
+                    "Line 1"
             )
     ));
 
@@ -151,6 +119,21 @@ public class MainController {
         return stops;
     }
 
+    private void addVehicles() {
+        vehicles.add(new Vehicle(
+                lines.get(0),
+                new TimetableEntry(stops.get(0), LocalTime.now()),
+                new Timetable(
+                        Arrays.asList(
+                                new TimetableEntry(lines.get(0).getStops().get(0), LocalTime.now().plusSeconds(10)),
+                                new TimetableEntry(lines.get(0).getStops().get(1), LocalTime.now().plusSeconds(20)),
+                                new TimetableEntry(lines.get(0).getStops().get(2), LocalTime.now().plusSeconds(30)),
+                                new TimetableEntry(lines.get(0).getStops().get(3), LocalTime.now().plusSeconds(40))
+                        )
+                )
+        ));
+    }
+
     @FXML
     private void onTimeScaleSet() {
         float scale = Float.parseFloat(timeScale.getText());
@@ -168,7 +151,7 @@ public class MainController {
                     localTime = localTime.plusNanos(1000000000);
                     time.setText(localTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")));
                     for (Vehicle vehicle : vehicles) {
-                        vehicle.drive(streets, localTime);
+                        vehicle.drive(localTime, content);
                     }
                 });
             }
@@ -176,20 +159,40 @@ public class MainController {
     }
 
     @FXML
-    private void onLoad() {
-        for (int i = 0; i < content.getHeight(); i += 15) {
-            Line line = new Line(0, i, content.getWidth(), i);
-            line.setStrokeWidth(0.1);
-            line.setOpacity(0.2);
-            content.getChildren().add(line);
-        }
+    private void onAction1() {
+        System.out.println(stops.get(index));
+        Path path = lines.get(0).getPathToNextStop(lines.get(0).getStops().get(index));
 
-        for (int i = 0; i < content.getWidth(); i += 15) {
-            Line line = new Line(i, 0, i, content.getHeight());
-            line.setStrokeWidth(0.1);
-            line.setOpacity(0.2);
-            content.getChildren().add(line);
+        if(path != null) {
+            Shape shape = path.getShape();
+            shape.setFill(paint[index]);
+            content.getChildren().add(shape);
         }
+        index++;
+    }
+
+    @FXML
+    private void onAction2() {
+
+    }
+
+    @FXML
+    private void onLoad() {
+        addVehicles();
+
+//        for (int i = 0; i < content.getHeight(); i += 15) {
+//            Line line = new Line(0, i, content.getWidth(), i);
+//            line.setStrokeWidth(0.1);
+//            line.setOpacity(0.2);
+//            content.getChildren().add(line);
+//        }
+//
+//        for (int i = 0; i < content.getWidth(); i += 15) {
+//            Line line = new Line(i, 0, i, content.getHeight());
+//            line.setStrokeWidth(0.1);
+//            line.setOpacity(0.2);
+//            content.getChildren().add(line);
+//        }
 
         List<Drawable> elements = new ArrayList<>();
 
@@ -202,7 +205,20 @@ public class MainController {
         }
 
         timer = new Timer(false);
-        timer.scheduleAtFixedRate(vehicleUpdate, 0, 1000);
+        localTime = LocalTime.now();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(() -> {
+                    localTime = localTime.plusNanos(1000000000);
+                    time.setText(localTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+                    for (Vehicle vehicle : vehicles) {
+                        vehicle.drive(localTime, content);
+                    }
+                });
+            }
+        }, 0, 1000);
+
 
         for (Vehicle vehicle :
                 vehicles) {
@@ -213,19 +229,8 @@ public class MainController {
 
                 listView.setItems(FXCollections.observableArrayList(vehicle1.getLine().getStops()));
 
-                List<Path> paths = vehicle1.getLine().getPath(streets);
-                Shape shape = null;
-                for (Path path : paths) {
-                    if(shape == null){
-                        shape = path.getShape();
-                    } else {
-                        shape = Shape.union(shape, path.getShape());
-                    }
-                }
+                Shape shape = vehicle1.getLine().getGui();
 
-                if (shape != null) {
-                    shape.setFill(Color.FORESTGREEN);
-                }
                 selectedShape = shape;
                 content.getChildren().add(shape);
             });
