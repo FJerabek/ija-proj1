@@ -54,7 +54,7 @@ public class Vehicle implements Drawable {
         this.line = line;
         this.currentStop = startEntry;
 
-        Circle circle = new Circle(position.getX(), position.getY(), 7, Color.BLUE);
+        Circle circle = new Circle(position.getX(), position.getY(), 7, line.getColor());
         Text text = new Text(position.getX() + 7, position.getY() + 4, line.getName());
         text.setFont(Font.font(text.getFont().getFamily(), FontWeight.BOLD, 15));
         gui = new ArrayList<>();
@@ -64,7 +64,7 @@ public class Vehicle implements Drawable {
 
     private void postConstruct() {
         this.position = currentStop.getStop().getCoordinates();
-        Circle circle = new Circle(position.getX(), position.getY(), 7, Color.BLUE);
+        Circle circle = new Circle(position.getX(), position.getY(), 7, line.getColor());
         Text text = new Text(position.getX() + 7, position.getY() + 4, line.getName());
         text.setFont(Font.font(text.getFont().getFamily(), FontWeight.BOLD, 15));
         gui = new ArrayList<>();
@@ -104,7 +104,7 @@ public class Vehicle implements Drawable {
      * Updates vehicle position according to time and its timetable
      * @param time current time
      */
-    public void drive(LocalTime time, Pane pane) {
+    public void drive(LocalTime time) {
         if(nextEntry == null) {
             nextEntry = timetable.getNextEntry(time);
             if(nextEntry == null) {
@@ -119,7 +119,7 @@ public class Vehicle implements Drawable {
                 moveGuiPoint(currentStop.getStop().getCoordinates().getX() - position.getX(), currentStop.getStop().getCoordinates().getY() - position.getY());
                 return;
             }
-            path = line.getPathToNextStop(currentStop.getStop());
+            path = line.getPathToNextStop(currentStop.getStop(), nextEntry.getStop());
         }
 
         if(currentStop != null && nextEntry != null) {
@@ -131,7 +131,7 @@ public class Vehicle implements Drawable {
         }
 
         if(path == null) {
-            path = line.getPathToNextStop(currentStop.getStop());
+            path = line.getPathToNextStop(currentStop.getStop(), nextEntry.getStop());
             if(path == null) {
                 return;
             }

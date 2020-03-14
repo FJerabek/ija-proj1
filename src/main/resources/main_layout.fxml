@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.Group?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="775.0" prefWidth="1099.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vut.fit.ija.proj1.gui.MainController">
+<AnchorPane prefHeight="775.0" prefWidth="1099.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vut.fit.ija.proj1.gui.MainController">
    <BorderPane prefHeight="775.0" prefWidth="1099.0">
       <center>
            <ScrollPane fx:id="scroll" pannable="true" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
@@ -31,6 +24,7 @@
                <Label layoutX="49.0" layoutY="36.0" text="Time speed: " AnchorPane.rightAnchor="130.0" AnchorPane.topAnchor="36.0" />
                <TextField fx:id="timeScale" layoutX="124.0" layoutY="32.0" prefHeight="25.0" prefWidth="67.0" AnchorPane.rightAnchor="55.0" AnchorPane.topAnchor="32.0" />
                <Button layoutX="195.0" layoutY="32.0" mnemonicParsing="false" onAction="#onTimeScaleSet" prefHeight="25.0" prefWidth="38.0" text="Set" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="32.0" />
+               <Button layoutX="14.0" layoutY="6.0" mnemonicParsing="false" onAction="#onDebug" text="Button" />
             </children>
          </AnchorPane>
       </right>

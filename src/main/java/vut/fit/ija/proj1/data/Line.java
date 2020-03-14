@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
 import vut.fit.ija.proj1.gui.elements.Stop;
 import vut.fit.ija.proj1.gui.elements.Street;
@@ -19,8 +20,9 @@ import java.util.Objects;
  */
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
 public class Line {
-    private List<Stop> stops;
     private String name;
+    private Color color;
+    private List<Stop> stops;
     @JsonProperty("streets")
     private List<Street> path;
 
@@ -31,11 +33,14 @@ public class Line {
      * Creates a line with specified name and stop plan
      * @param stops Stops on line
      * @param name Line name
+     * @param streets Streets that line goes on
+     * @param color Line color
      */
-    public Line(List<Stop> stops, List<Street> path,  String name) {
+    public Line(List<Stop> stops, String name, List<Street> streets, Color color) {
         this.stops = stops;
         this.name = name;
-        this.path = path;
+        this.path = streets;
+        this.color = color;
     }
 
     @JsonIgnore
@@ -81,7 +86,7 @@ public class Line {
      * @return path to the next stop on this line
      */
     @JsonIgnore
-    public Path getPathToNextStop(Stop currentStop) {
+    public Path getPathToNextStop(Stop currentStop, Stop nextStop) {
         class PathInfo {
             protected List<Coordinates> path;
             protected Street currentStreet;
@@ -106,15 +111,15 @@ public class Line {
             }
         }
 
+
         List<Coordinates> coordinates = new ArrayList<>();
         List<PathInfo> open = new ArrayList<>();
         HashSet<PathInfo> found = new HashSet<>();
 
-        int nextStopIndex = stops.indexOf(currentStop) + 1;
-        if(nextStopIndex >= stops.size()) {
-            nextStopIndex %= stops.size();
-        }
-        Stop nextStop = stops.get(nextStopIndex);
+//        int nextStopIndex = stops.indexOf(currentStop) + 1;
+//        if(nextStopIndex >= stops.size()) {
+//            nextStopIndex %= stops.size();
+//        }
         Street nextStopStreet = getStopStreet(nextStop);
         coordinates.add(currentStop.getCoordinates());
         Street stopStreet = getStopStreet(currentStop);
@@ -138,7 +143,7 @@ public class Line {
                     newCoordinates.add(crossing);
                 PathInfo info = new PathInfo(newCoordinates, neighbor);
                 if(info.currentStreet.equals(nextStopStreet)) {
-                    info.path.add(info.currentStreet.getCrossingCoordinates(nextStopStreet));
+//                    info.path.add(info.currentStreet.getCrossingCoordinates(nextStopStreet));
                     found.add(info);
                 } else {
                     boolean foundFlag = false;
@@ -183,6 +188,10 @@ public class Line {
         return stops;
     }
 
+    public Color getColor() {
+        return color;
+    }
+
     /**
      * Returns line name
      * @return Line name
@@ -200,7 +209,7 @@ public class Line {
         Shape shape = null;
         for (int i = 0; i < stops.size() - 1; i++) {
             Stop stop = stops.get(i);
-            Path path = getPathToNextStop(stop);
+            Path path = getPathToNextStop(stop, stops.get(i + 1));
             if (shape == null) {
                 shape = path.getShape();
             } else {
@@ -208,7 +217,7 @@ public class Line {
             }
         }
         if (shape != null) {
-            shape.setFill(Color.FORESTGREEN);
+            shape.setFill(color);
         }
         return shape;
     }

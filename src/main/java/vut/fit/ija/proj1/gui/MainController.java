@@ -11,6 +11,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Shape;
+import vut.fit.ija.proj1.data.Line;
 import vut.fit.ija.proj1.gui.elements.Stop;
 import vut.fit.ija.proj1.gui.elements.Street;
 import vut.fit.ija.proj1.gui.elements.Vehicle;
@@ -102,15 +103,18 @@ public class MainController {
                 if (selectedShape != null) {
                     content.getChildren().remove(selectedShape);
                 }
-
                 listView.setItems(FXCollections.observableArrayList(vehicle1.getLine().getStops()));
-
                 Shape shape = vehicle1.getLine().getGui();
-
                 selectedShape = shape;
                 content.getChildren().add(shape);
             });
         }
+    }
+
+    @FXML
+    public void onDebug() {
+        Line line = vehicles.get(0).getLine();
+        content.getChildren().add(line.getPathToNextStop(line.getStops().get(4), line.getStops().get(0)).getShape());
     }
 
     public void startTime(float scale) {
@@ -122,7 +126,7 @@ public class MainController {
                     localTime = localTime.plusSeconds(1);
                     time.setText(localTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")));
                     for (Vehicle vehicle : vehicles) {
-                        vehicle.drive(localTime, content);
+                        vehicle.drive(localTime);
                     }
                 });
             }
