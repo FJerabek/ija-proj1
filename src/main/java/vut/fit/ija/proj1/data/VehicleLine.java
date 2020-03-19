@@ -5,9 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
-import vut.fit.ija.proj1.gui.elements.Stop;
+import vut.fit.ija.proj1.gui.elements.VehicleStop;
 import vut.fit.ija.proj1.gui.elements.Street;
 
 import java.util.ArrayList;
@@ -19,14 +18,14 @@ import java.util.Objects;
  * Represents a line that vehicle takes
  */
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "name")
-public class Line {
+public class VehicleLine {
     private String name;
     private Color color;
-    private List<Stop> stops;
+    private List<VehicleStop> stops;
     @JsonProperty("streets")
     private List<Street> path;
 
-    public Line() {
+    public VehicleLine() {
     }
 
     /**
@@ -36,7 +35,7 @@ public class Line {
      * @param streets Streets that line goes on
      * @param color Line color
      */
-    public Line(List<Stop> stops, String name, List<Street> streets, Color color) {
+    public VehicleLine(List<VehicleStop> stops, String name, List<Street> streets, Color color) {
         this.stops = stops;
         this.name = name;
         this.path = streets;
@@ -44,7 +43,7 @@ public class Line {
     }
 
     @JsonIgnore
-    private Street getStopStreet(Stop stop) {
+    private Street getStopStreet(VehicleStop stop) {
         for(Street street : path) {
             if(street.getStops().contains(stop)) {
                 return street;
@@ -86,7 +85,7 @@ public class Line {
      * @return path to the next stop on this line
      */
     @JsonIgnore
-    public Path getPathToNextStop(Stop currentStop, Stop nextStop) {
+    public Path getPathToNextStop(VehicleStop currentStop, VehicleStop nextStop) {
         class PathInfo {
             protected List<Coordinates> path;
             protected Street currentStreet;
@@ -184,7 +183,7 @@ public class Line {
      * Returns stops on line
      * @return Stops on line
      */
-    public List<Stop> getStops() {
+    public List<VehicleStop> getStops() {
         return stops;
     }
 
@@ -208,7 +207,7 @@ public class Line {
     public Shape getGui() {
         Shape shape = null;
         for (int i = 0; i < stops.size() - 1; i++) {
-            Stop stop = stops.get(i);
+            VehicleStop stop = stops.get(i);
             Path path = getPathToNextStop(stop, stops.get(i + 1));
             if (shape == null) {
                 shape = path.getShape();

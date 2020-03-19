@@ -1,29 +1,29 @@
 package vut.fit.ija.proj1.data.file;
 
-import vut.fit.ija.proj1.data.Line;
-import vut.fit.ija.proj1.gui.elements.Stop;
+import vut.fit.ija.proj1.data.VehicleLine;
+import vut.fit.ija.proj1.gui.elements.VehicleStop;
 import vut.fit.ija.proj1.gui.elements.Street;
 import vut.fit.ija.proj1.gui.elements.Vehicle;
 
 import java.util.List;
 
 public class Data {
-    private List<Stop> stops;
+    private List<VehicleStop> stops;
     private List<Street> streets;
-    private List<Line> lines;
+    private List<VehicleLine> lines;
     private List<Vehicle> vehicles;
 
 
     public Data() {}
 
-    public Data(List<Street> streets, List<Stop> stops, List<Line> lines, List<Vehicle> vehicles) {
+    public Data(List<Street> streets, List<VehicleStop> stops, List<VehicleLine> lines, List<Vehicle> vehicles) {
         this.streets = streets;
         this.stops = stops;
         this.lines = lines;
         this.vehicles = vehicles;
     }
 
-    public List<Line> getLines() {
+    public List<VehicleLine> getLines() {
         return lines;
     }
 
@@ -31,7 +31,7 @@ public class Data {
         return streets;
     }
 
-    public List<Stop> getStops() {
+    public List<VehicleStop> getStops() {
         return stops;
     }
 

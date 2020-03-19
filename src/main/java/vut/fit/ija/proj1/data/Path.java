@@ -2,10 +2,9 @@ package vut.fit.ija.proj1.data;
 
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
-import vut.fit.ija.proj1.gui.elements.Stop;
+import vut.fit.ija.proj1.gui.elements.VehicleStop;
 import vut.fit.ija.proj1.gui.elements.Street;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,6 +12,7 @@ import java.util.List;
  */
 public class Path {
     private List<Coordinates> path;
+    private List<Street> streets;
 
     /**
      * Constructs a new path
@@ -100,9 +100,9 @@ public class Path {
      * @param streets all streets on map
      * @return stop if there is a stop, null otherwise
      */
-    private static Stop getStopByCoordinates(Coordinates coordinates, List<Street> streets) {
+    private static VehicleStop getStopByCoordinates(Coordinates coordinates, List<Street> streets) {
         for(Street street : streets) {
-            for(Stop stop : street.getStops()) {
+            for(VehicleStop stop : street.getStops()) {
                 if (stop.getCoordinates().equals(coordinates)) {
                     return stop;
                 }

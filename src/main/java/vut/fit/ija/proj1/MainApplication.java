@@ -49,7 +49,7 @@ public class MainApplication extends Application {
             controller.drawStreets(loaded.getStreets());
             controller.drawStops(loaded.getStops());
             controller.setVehicles(loaded.getVehicles());
-            controller.setVehiclesOnSelect();
+            controller.setCallbacks();
             controller.startTime(1);
         } catch (IOException e) {
             e.printStackTrace();

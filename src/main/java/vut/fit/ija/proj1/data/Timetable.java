@@ -3,7 +3,6 @@ package vut.fit.ija.proj1.data;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import vut.fit.ija.proj1.gui.elements.Stop;
 
 import java.time.LocalTime;
 import java.util.List;

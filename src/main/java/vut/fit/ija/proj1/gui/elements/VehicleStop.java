@@ -16,11 +16,11 @@ import java.util.Objects;
  * Class representing single stop on map
  */
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class Stop implements Drawable {
+public class VehicleStop implements Drawable {
     private String id;
     private Coordinates coordinates;
 
-    public Stop() {
+    public VehicleStop() {
     }
 
     /**
@@ -28,7 +28,7 @@ public class Stop implements Drawable {
      * @param id stop id/name
      * @param coordinates stop coordinates
      */
-    public Stop(String id, Coordinates coordinates) {
+    public VehicleStop(String id, Coordinates coordinates) {
         this.id = id;
         this.coordinates = coordinates;
     }
@@ -57,7 +57,7 @@ public class Stop implements Drawable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Stop stop = (Stop) o;
+        VehicleStop stop = (VehicleStop) o;
         return id.equals(stop.id);
     }
 

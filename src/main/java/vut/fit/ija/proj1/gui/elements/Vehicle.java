@@ -27,7 +27,7 @@ public class Vehicle implements Drawable {
     private Coordinates position;
     @JsonIgnore
     private TimetableEntry currentStop;
-    private Line line;
+    private VehicleLine line;
     private Timetable timetable;
     @JsonIgnore
     private TimetableEntry nextEntry;
@@ -44,7 +44,7 @@ public class Vehicle implements Drawable {
      * @param line Vehicle drive line
      * @param timetable Vehicle timetable
      */
-    public Vehicle(Line line, Timetable timetable) {
+    public Vehicle(VehicleLine line, Timetable timetable) {
         this.position = timetable.getEntries().get(0).getStop().getCoordinates();
         this.timetable = timetable;
         this.line = line;
@@ -79,7 +79,7 @@ public class Vehicle implements Drawable {
      * Returns vehicle line
      * @return vehicle line
      */
-    public Line getLine() {
+    public VehicleLine getLine() {
         return line;
     }
 

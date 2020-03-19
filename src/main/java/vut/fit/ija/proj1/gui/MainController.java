@@ -1,18 +1,24 @@
 package vut.fit.ija.proj1.gui;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
-import vut.fit.ija.proj1.data.Line;
-import vut.fit.ija.proj1.gui.elements.Stop;
+import vut.fit.ija.proj1.data.Timetable;
+import vut.fit.ija.proj1.data.TimetableEntry;
+import vut.fit.ija.proj1.data.VehicleLine;
+import vut.fit.ija.proj1.gui.elements.VehicleStop;
 import vut.fit.ija.proj1.gui.elements.Street;
 import vut.fit.ija.proj1.gui.elements.Vehicle;
 
@@ -29,6 +35,19 @@ public class MainController {
     private List<Vehicle> vehicles;
     private List<Street> streets;
 
+    private ChangeListener<Number> trafficListener;
+    private ChangeListener<Boolean> closedListener;
+
+
+    @FXML
+    private CheckBox streetClosed;
+
+    @FXML
+    private Slider traffic;
+
+    @FXML
+    private AnchorPane streetConfig;
+
     @FXML
     private TextField timeScale;
 
@@ -36,7 +55,7 @@ public class MainController {
     private Label time;
 
     @FXML
-    private ListView<Stop> listView;
+    private ListView<TimetableEntry> listView;
 
     @FXML
     private ScrollPane scroll;
@@ -60,12 +79,7 @@ public class MainController {
 
     @FXML
     private void onClicked(MouseEvent e) {
-        if(selectedShape != null) {
-            content.getChildren().remove(selectedShape);
-        } else {
-
-        }
-        listView.setItems(null);
+        deselectItem();
     }
 
     @FXML
@@ -90,25 +104,41 @@ public class MainController {
     public void drawStreets(List<Street> streets) {
         this.streets = streets;
         for(Street street : streets) {
-//            street.setOnSelectListener((selectedStreet) -> System.out.println("tets " + selectedStreet.getName()));
             content.getChildren().addAll(street.draw());
         }
     }
 
-    public void drawStops(List<Stop> stops) {
-        for(Stop stop : stops) {
+    public void drawStops(List<VehicleStop> stops) {
+        for(VehicleStop stop : stops) {
             content.getChildren().addAll(stop.draw());
         }
     }
 
-    public void setVehiclesOnSelect() {
+
+    private void deselectItem() {
+        if (selectedShape != null) {
+            content.getChildren().remove(selectedShape);
+        }
+
+        if(trafficListener != null)
+            traffic.valueProperty().removeListener(trafficListener);
+
+        if(closedListener != null)
+            streetClosed.selectedProperty().removeListener(closedListener);
+
+        listView.setItems(null);
+        listView.setVisible(false);
+        streetConfig.setVisible(false);
+    }
+
+    private void setVehicleCallbacks() {
         for (Vehicle vehicle :
                 vehicles) {
             vehicle.setOnSelectListener(vehicle1 -> {
-                if (selectedShape != null) {
-                    content.getChildren().remove(selectedShape);
-                }
-                listView.setItems(FXCollections.observableArrayList(vehicle1.getLine().getStops()));
+                deselectItem();
+                listView.setVisible(true);
+
+                listView.setItems(FXCollections.observableArrayList(vehicle1.getTimetable().getEntries()));
                 Shape shape = vehicle1.getLine().getGui();
                 selectedShape = shape;
                 content.getChildren().add(shape);
@@ -116,9 +146,47 @@ public class MainController {
         }
     }
 
+    private void setStreetCallbacks() {
+        for (Street street : streets) {
+            street.setOnSelectListener((selectedStreet) -> {
+                deselectItem();
+                streetConfig.setVisible(true);
+
+                traffic.setValue(selectedStreet.getTraffic());
+                streetClosed.setSelected(street.isClosed());
+
+                trafficListener = (observable, oldValue, newValue) -> {
+                    selectedStreet.setTraffic(newValue.doubleValue());
+                };
+
+                traffic.valueProperty().addListener(trafficListener);
+
+                closedListener = (observable, oldValue, newValue) -> {
+                    selectedStreet.setClosed(newValue);
+                };
+
+                streetClosed.selectedProperty().addListener(closedListener);
+
+                Line line = new Line(selectedStreet.getFrom().getX(), selectedStreet.getFrom().getY(),
+                        selectedStreet.getTo().getX(), selectedStreet.getTo().getY());
+
+                line.setStroke(Color.valueOf("#d32f2f"));
+                line.setStrokeWidth(3);
+
+                selectedShape = line;
+                content.getChildren().add(line);
+            });
+        }
+    }
+
+    public void setCallbacks() {
+        setVehicleCallbacks();
+        setStreetCallbacks();
+    }
+
     @FXML
     public void onDebug() {
-        Line line = vehicles.get(0).getLine();
+        VehicleLine line = vehicles.get(1).getLine();
         content.getChildren().add(line.getPathToNextStop(line.getStops().get(4), line.getStops().get(0)).getShape());
     }
 

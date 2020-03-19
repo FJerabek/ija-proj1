@@ -3,6 +3,8 @@ package vut.fit.ija.proj1.gui.elements;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.util.StdConverter;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
@@ -16,12 +18,16 @@ import java.util.Objects;
 /**
  * Class representing single street on map
  */
+@JsonDeserialize(converter=Street.StreetSanitizer.class)
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "name")
 public class Street implements Drawable {
     private String name;
-    private List<Stop> stops;
+    private List<VehicleStop> stops;
     private Coordinates from;
     private Coordinates to;
+    private boolean closed = false;
+    private double traffic = 0;
+    @JsonIgnore
     private List<Shape> gui;
 
     public Street() {
@@ -34,23 +40,11 @@ public class Street implements Drawable {
      * @param to street to coordinates
      * @param stops stops on this street
      */
-    public Street(String name, Coordinates from, Coordinates to, List<Stop> stops) {
+    public Street(String name, Coordinates from, Coordinates to, List<VehicleStop> stops) {
         this.name = name;
         this.from = from;
         this.to = to;
         this.stops = stops;
-    }
-
-    @JsonIgnore
-    @Override
-    public Coordinates getCoordinates() {
-        return new Coordinates((from.getX() + to.getX()) / 2, (from.getY() + to.getY()) / 2);
-    }
-
-    @Override
-    public List<Shape> draw() {
-        if (gui != null)
-            return gui;
 
         Text x = new Text(from.getX() + 10, from.getY() + 20, String.format("x: %s\ny: %s", from.getX(), from.getY()));
         Text y = new Text(to.getX() + 10, to.getY() + 20, String.format("x: %s\ny: %s", to.getX(), to.getY()));
@@ -66,15 +60,49 @@ public class Street implements Drawable {
                 y,
                 new Line(from.getX(), from.getY(), to.getX(), to.getY())
         );
+    }
+
+    @JsonIgnore
+    @Override
+    public Coordinates getCoordinates() {
+        return new Coordinates((from.getX() + to.getX()) / 2, (from.getY() + to.getY()) / 2);
+    }
+
+    @Override
+    public List<Shape> draw() {
         return gui;
+    }
+
+    public double getTraffic() {
+        return traffic;
+    }
+
+    public void setTraffic(double traffic) {
+        this.traffic = traffic;
+    }
+
+    public boolean isClosed() {
+        return closed;
+    }
+
+    public void setClosed(boolean closed) {
+        this.closed = closed;
+        gui.forEach(shape -> {
+            if (shape.getClass() == Line.class) {
+                if(closed) {
+                    shape.getStrokeDashArray().addAll(5d, 5d);
+                } else {
+                    shape.getStrokeDashArray().removeAll(5d, 5d);
+                }
+            }
+        });
     }
 
     public void setOnSelectListener(OnStreetSelect listener) {
         for (Shape shape: draw()) {
             shape.setOnMouseClicked(event -> {
-                if(event.isPrimaryButtonDown()) {
-                    listener.onSelect(this);
-                }
+                listener.onSelect(this);
+                event.consume();
             });
         }
     }
@@ -83,7 +111,7 @@ public class Street implements Drawable {
      * Returns stops on this street
      * @return stops on this street
      */
-    public List<Stop> getStops() {
+    public List<VehicleStop> getStops() {
         return stops;
     }
 
@@ -139,7 +167,34 @@ public class Street implements Drawable {
         return name;
     }
 
+    private void jacksonPostConstruct() {
+        Text x = new Text(from.getX() + 10, from.getY() + 20, String.format("x: %s\ny: %s", from.getX(), from.getY()));
+        Text y = new Text(to.getX() + 10, to.getY() + 20, String.format("x: %s\ny: %s", to.getX(), to.getY()));
+        Font font = x.getFont();
+        font = Font.font(font.getFamily(), 8);
+        x.setFont(font);
+        y.setFont(font);
+
+
+        gui = Arrays.asList(
+                new Text(getCoordinates().getX(), getCoordinates().getY(), name),
+                x,
+                y,
+                new Line(from.getX(), from.getY(), to.getX(), to.getY())
+        );
+    }
+
+
     public interface OnStreetSelect{
         void onSelect(Street street);
+    }
+
+    static class StreetSanitizer extends StdConverter<Street, Street> {
+
+        @Override
+        public Street convert(Street value) {
+            value.jacksonPostConstruct();
+            return value;
+        }
     }
 }

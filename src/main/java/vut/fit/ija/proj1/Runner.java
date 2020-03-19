@@ -1,13 +1,5 @@
 package vut.fit.ija.proj1;
 
-import vut.fit.ija.proj1.data.Coordinates;
-import vut.fit.ija.proj1.gui.elements.Stop;
-import vut.fit.ija.proj1.gui.elements.Street;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 public class Runner {
     public static void main(String[] args) {
         MainApplication.main(args);
