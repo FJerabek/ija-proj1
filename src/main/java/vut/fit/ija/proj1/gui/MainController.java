@@ -126,6 +126,11 @@ public class MainController {
         startTime(scale);
     }
 
+    @FXML
+    public void onExitLineEdit() {
+        changeApplicationMode(ApplicationState.VIEW);
+    }
+
     public void setLines(List<VehicleLine> lines) {
         this.lines = lines;
     }
@@ -215,6 +220,9 @@ public class MainController {
                 setStreetOnClickCallback(defaultOnStreetSelectListener);
                 timeScale.setDisable(true);
                 setTimeScaleButton.setDisable(false);
+                lineModifySidePanelContainer.setVisible(false);
+                timeScale.setDisable(false);
+                setTimeScaleButton.setDisable(false);
                 scroll.setStyle(
                         "-fx-border-color: #32681d;" +
                         "-fx-border-width: 3;"
@@ -225,6 +233,7 @@ public class MainController {
 
             case LINE_MODIFY:
                 setStreetOnClickCallback(lineModifySidePanel.getOnStreetSelectListener());
+                lineListView.refresh();
                 lineModifySidePanelContainer.setVisible(true);
                 listView.setVisible(false);
                 streetConfig.setVisible(false);

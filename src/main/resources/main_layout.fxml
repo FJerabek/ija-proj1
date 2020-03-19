@@ -30,7 +30,7 @@
             <children>
                <Label layoutX="25.0" layoutY="6.0" prefHeight="17.0" prefWidth="38.0" text="Time:" AnchorPane.rightAnchor="70.0" AnchorPane.topAnchor="10.0" />
                <Label fx:id="time" layoutX="103.0" layoutY="10.0" text="50" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
-               <AnchorPane fx:id="lineModifySidePanelContainer" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="120.0">
+               <AnchorPane fx:id="lineModifySidePanelContainer" prefHeight="200.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="120.0">
                   <children>
                      <Label alignment="CENTER" text="Line modify  config" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="10.0">
                         <font>
@@ -54,7 +54,8 @@
                            <Font name="Arial Bold" size="14.0" />
                         </font>
                      </Label>
-                     <ListView fx:id="pathListView" layoutX="9.0" layoutY="448.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="430.0" />
+                     <ListView fx:id="pathListView" layoutX="9.0" layoutY="448.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="430.0" />
+                     <Button layoutX="41.0" layoutY="625.0" mnemonicParsing="false" onAction="#onExitLineEdit" text="Exit line edit mode" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="630.0" />
                   </children>
                </AnchorPane>
                <AnchorPane fx:id="streetConfig" layoutX="6.0" layoutY="148.0" prefHeight="200.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="120.0">

@@ -17,8 +17,6 @@ public class VehicleLine {
     private String name;
     private Color color;
     private List<VehicleStop> stops;
-    @JsonProperty("streets")
-    private List<Street> path;
     @JsonProperty("stopPaths")
     private List<PathBetweenStops> stopsPath;
 
@@ -29,25 +27,13 @@ public class VehicleLine {
      * Creates a line with specified name and stop plan
      * @param stops Stops on line
      * @param name Line name
-     * @param streets Streets that line goes on
      * @param color Line color
      */
-    public VehicleLine(List<VehicleStop> stops, String name, List<Street> streets, Color color, List<PathBetweenStops> stopsPath) {
+    public VehicleLine(List<VehicleStop> stops, String name, Color color, List<PathBetweenStops> stopsPath) {
         this.stops = stops;
         this.name = name;
-        this.path = streets;
         this.color = color;
         this.stopsPath = stopsPath;
-    }
-
-    @JsonIgnore
-    private Street getStopStreet(VehicleStop stop) {
-        for(Street street : path) {
-            if(street.getStops().contains(stop)) {
-                return street;
-            }
-        }
-        return null;
     }
 
     public List<PathBetweenStops> getStopsPath() {
@@ -89,10 +75,6 @@ public class VehicleLine {
      */
     public String getName() {
         return name;
-    }
-
-    public List<Street> getPath() {
-        return path;
     }
 
     @JsonIgnore

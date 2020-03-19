@@ -1,6 +1,7 @@
 package vut.fit.ija.proj1.gui;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -37,6 +38,14 @@ public class LineModifySidePanel {
             content.getChildren().remove(selected.line);
             newPath.remove(selected);
         } else {
+            if(street.isClosed()) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Street is closed");
+                alert.setHeaderText("Street is closed");
+                alert.setContentText("Selected street is closed. Invalid path");
+                alert.showAndWait();
+                return;
+            }
             if(newPath.size() > 0) {
                 SelectedStreet selectedStreet = newPath.get(newPath.size() - 1);
                 if (selectedStreet.street.getCrossingCoordinates(street) == null) {
@@ -52,7 +61,7 @@ public class LineModifySidePanel {
                     Alert alert = new Alert(Alert.AlertType.WARNING);
                     alert.setTitle("Invalid path origin");
                     alert.setHeaderText("Invalid path origin");
-                    alert.setContentText("Path must start from one og the connecting stops");
+                    alert.setContentText("Path must start from one of the connecting stops");
                     alert.showAndWait();
                     return;
                 } else {
@@ -83,14 +92,15 @@ public class LineModifySidePanel {
                 }
 
 
-                lines.get(lines.indexOf(currentEdit.line)).getStopsPath().remove(currentEdit.path);
-                lines.get(lines.indexOf(currentEdit.line)).getStopsPath().add(pathBetweenStops);
+                currentEdit.line.getStopsPath().remove(currentEdit.path);
+                currentEdit.line.getStopsPath().add(pathBetweenStops);
 
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Path set");
                 alert.setHeaderText("Path set");
                 alert.setContentText("Path was successfully set");
                 alert.showAndWait();
+                updateLists();
             }
         }
     };
@@ -109,6 +119,11 @@ public class LineModifySidePanel {
         newPath = new ArrayList<>();
         setLineFactories();
         setupLineModify();
+    }
+
+    private void updateLists() {
+        lineListView.refresh();
+        pathListView.refresh();
     }
 
     private void setLineFactories() {
@@ -202,6 +217,7 @@ public class LineModifySidePanel {
 
     private void editPath(EditablePathBetweenStops path) {
         currentEdit = path;
+        newPath = new ArrayList<>();
         deselectAll();
     }
 

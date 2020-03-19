@@ -94,7 +94,9 @@ public class PathBetweenStops {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PathBetweenStops that = (PathBetweenStops) o;
-        return stop1.equals(that.stop1) || stop1.equals(that.stop2);
+
+        return (stop1.equals(that.stop1) || stop1.equals(that.stop2)) &&
+                (stop2.equals(that.stop1) || stop2.equals(that.stop2));
     }
 
     @Override
