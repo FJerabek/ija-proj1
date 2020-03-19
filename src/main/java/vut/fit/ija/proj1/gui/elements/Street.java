@@ -16,12 +16,13 @@ import java.util.Objects;
 /**
  * Class representing single street on map
  */
-@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "name")
 public class Street implements Drawable {
     private String name;
     private List<Stop> stops;
     private Coordinates from;
     private Coordinates to;
+    private List<Shape> gui;
 
     public Street() {
     }
@@ -48,6 +49,9 @@ public class Street implements Drawable {
 
     @Override
     public List<Shape> draw() {
+        if (gui != null)
+            return gui;
+
         Text x = new Text(from.getX() + 10, from.getY() + 20, String.format("x: %s\ny: %s", from.getX(), from.getY()));
         Text y = new Text(to.getX() + 10, to.getY() + 20, String.format("x: %s\ny: %s", to.getX(), to.getY()));
         Font font = x.getFont();
@@ -56,12 +60,23 @@ public class Street implements Drawable {
         y.setFont(font);
 
 
-        return Arrays.asList(
+        gui = Arrays.asList(
                 new Text(getCoordinates().getX(), getCoordinates().getY(), name),
                 x,
                 y,
                 new Line(from.getX(), from.getY(), to.getX(), to.getY())
         );
+        return gui;
+    }
+
+    public void setOnSelectListener(OnStreetSelect listener) {
+        for (Shape shape: draw()) {
+            shape.setOnMouseClicked(event -> {
+                if(event.isPrimaryButtonDown()) {
+                    listener.onSelect(this);
+                }
+            });
+        }
     }
 
     /**
@@ -122,5 +137,9 @@ public class Street implements Drawable {
     @Override
     public String toString() {
         return name;
+    }
+
+    public interface OnStreetSelect{
+        void onSelect(Street street);
     }
 }

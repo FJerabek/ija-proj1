@@ -15,7 +15,7 @@ import java.util.Objects;
 /**
  * Class representing single stop on map
  */
-@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Stop implements Drawable {
     private String id;
     private Coordinates coordinates;

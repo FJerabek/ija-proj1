@@ -2,7 +2,6 @@ package vut.fit.ija.proj1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -11,16 +10,11 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import vut.fit.ija.proj1.data.Line;
-import vut.fit.ija.proj1.data.file.ColorSerializer;
 import vut.fit.ija.proj1.data.file.Data;
 import vut.fit.ija.proj1.gui.MainController;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * Represents main application
@@ -51,21 +45,6 @@ public class MainApplication extends Application {
 
         try {
             Data loaded = loadMapLayout(new java.io.File("test.yml"));
-            YAMLFactory factory = new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER);
-            factory.enable(YAMLGenerator.Feature.INDENT_ARRAYS);
-            ObjectMapper mapper = new ObjectMapper(factory);
-            mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-            SimpleModule colorSerializerModule = new SimpleModule();
-            colorSerializerModule.addSerializer(Color.class, new ColorSerializer());
-            mapper.registerModule(colorSerializerModule);
-            mapper.registerModule(new JavaTimeModule());
-            mapper.enable(SerializationFeature.INDENT_OUTPUT);
-
-            try {
-                mapper.writeValue(new File("test1.yml"), loaded);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
             MainController controller = loader.getController();
             controller.drawStreets(loaded.getStreets());
             controller.drawStops(loaded.getStops());

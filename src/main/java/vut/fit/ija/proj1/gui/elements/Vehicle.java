@@ -2,12 +2,9 @@ package vut.fit.ija.proj1.gui.elements;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.util.StdConverter;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
@@ -28,7 +25,7 @@ import java.util.Objects;
 public class Vehicle implements Drawable {
     @JsonIgnore
     private Coordinates position;
-    @JsonProperty("startingStop")
+    @JsonIgnore
     private TimetableEntry currentStop;
     private Line line;
     private Timetable timetable;
@@ -45,14 +42,12 @@ public class Vehicle implements Drawable {
     /**
      * Constructor for vehicle
      * @param line Vehicle drive line
-     * @param startEntry Vehicle starting point
      * @param timetable Vehicle timetable
      */
-    public Vehicle(Line line, TimetableEntry startEntry, Timetable timetable) {
-        this.position = startEntry.getStop().getCoordinates();
+    public Vehicle(Line line, Timetable timetable) {
+        this.position = timetable.getEntries().get(0).getStop().getCoordinates();
         this.timetable = timetable;
         this.line = line;
-        this.currentStop = startEntry;
 
         Circle circle = new Circle(position.getX(), position.getY(), 7, line.getColor());
         Text text = new Text(position.getX() + 7, position.getY() + 4, line.getName());
@@ -63,7 +58,7 @@ public class Vehicle implements Drawable {
     }
 
     private void postConstruct() {
-        this.position = currentStop.getStop().getCoordinates();
+        this.position = timetable.getEntries().get(0).getStop().getCoordinates();
         Circle circle = new Circle(position.getX(), position.getY(), 7, line.getColor());
         Text text = new Text(position.getX() + 7, position.getY() + 4, line.getName());
         text.setFont(Font.font(text.getFont().getFamily(), FontWeight.BOLD, 15));
@@ -100,11 +95,22 @@ public class Vehicle implements Drawable {
         }
     }
 
+    private double getDrivenDistanceByTime(LocalTime timeFrom, LocalTime time, LocalTime timeTo, double pathLength) {
+        double drivenPart =  (time.toNanoOfDay() - timeFrom.toNanoOfDay()) / (double)Math.abs(timeTo.toNanoOfDay() - timeFrom.toNanoOfDay());
+        return pathLength * drivenPart;
+    }
+
+
     /**
      * Updates vehicle position according to time and its timetable
      * @param time current time
      */
     public void drive(LocalTime time) {
+        if(currentStop == null) {
+            currentStop = timetable.getPreviousEntry(time);
+            if(currentStop == null)
+                return;
+        }
         if(nextEntry == null) {
             nextEntry = timetable.getNextEntry(time);
             if(nextEntry == null) {
@@ -115,9 +121,10 @@ public class Vehicle implements Drawable {
             currentStop = nextEntry;
             nextEntry = timetable.getNextEntry(time);
             if(nextEntry == null) {
-                System.out.println(String.format("Vehicle on line: \"%s\" has nowhere to go.", getLine().toString()));
-                moveGuiPoint(currentStop.getStop().getCoordinates().getX() - position.getX(), currentStop.getStop().getCoordinates().getY() - position.getY());
-                return;
+                if(timetable.getEntries().size() > 0)
+                    nextEntry = timetable.getEntries().get(0);
+                else
+                    return;
             }
             path = line.getPathToNextStop(currentStop.getStop(), nextEntry.getStop());
         }
@@ -136,8 +143,11 @@ public class Vehicle implements Drawable {
                 return;
             }
         }
-        double drivenPart =  (time.toNanoOfDay() - currentStop.getTime().toNanoOfDay()) / (double)(nextEntry.getTime().toNanoOfDay() - currentStop.getTime().toNanoOfDay());
-        double distance = path.getPathLenght() * drivenPart;
+
+        double distance = getDrivenDistanceByTime(currentStop.getTime(), time, nextEntry.getTime(), path.getPathLenght());
+        if(distance < 0)
+            return;
+
         Coordinates coords = path.getCoordinatesByDistance(distance);
         moveGuiPoint(coords.getX() - position.getX(), coords.getY() - position.getY());
         position = coords;

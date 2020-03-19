@@ -55,6 +55,20 @@ public class Timetable {
         return next;
     }
 
+    @JsonIgnore
+    public TimetableEntry getPreviousEntry(LocalTime currentTime) {
+        TimetableEntry previous = null;
+        for (TimetableEntry entry : entries) {
+            if(previous == null && entry.getTime().isBefore(currentTime)) {
+                previous = entry;
+            } else if (previous != null && entry.getTime().isBefore(currentTime) && entry.getTime().isAfter(previous.getTime())) {
+                previous = entry;
+            }
+
+        }
+        return previous;
+    }
+
     /**
      * Adds new timetable entry
      * @param entry new entry

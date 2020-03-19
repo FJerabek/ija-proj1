@@ -27,6 +27,7 @@ public class MainController {
     private Timer timer;
     private Shape selectedShape;
     private List<Vehicle> vehicles;
+    private List<Street> streets;
 
     @FXML
     private TextField timeScale;
@@ -61,6 +62,8 @@ public class MainController {
     private void onClicked(MouseEvent e) {
         if(selectedShape != null) {
             content.getChildren().remove(selectedShape);
+        } else {
+
         }
         listView.setItems(null);
     }
@@ -85,7 +88,9 @@ public class MainController {
     }
 
     public void drawStreets(List<Street> streets) {
+        this.streets = streets;
         for(Street street : streets) {
+//            street.setOnSelectListener((selectedStreet) -> System.out.println("tets " + selectedStreet.getName()));
             content.getChildren().addAll(street.draw());
         }
     }

@@ -18,7 +18,7 @@ import java.util.Objects;
 /**
  * Represents a line that vehicle takes
  */
-@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "name")
 public class Line {
     private String name;
     private Color color;
