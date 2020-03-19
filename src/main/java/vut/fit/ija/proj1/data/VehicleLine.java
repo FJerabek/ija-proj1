@@ -1,18 +1,13 @@
 package vut.fit.ija.proj1.data;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
+import vut.fit.ija.proj1.data.exceptions.StreetsNotConnectedException;
 import vut.fit.ija.proj1.gui.elements.VehicleStop;
 import vut.fit.ija.proj1.gui.elements.Street;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Represents a line that vehicle takes
@@ -24,6 +19,8 @@ public class VehicleLine {
     private List<VehicleStop> stops;
     @JsonProperty("streets")
     private List<Street> path;
+    @JsonProperty("stopPaths")
+    private List<PathBetweenStops> stopsPath;
 
     public VehicleLine() {
     }
@@ -35,11 +32,12 @@ public class VehicleLine {
      * @param streets Streets that line goes on
      * @param color Line color
      */
-    public VehicleLine(List<VehicleStop> stops, String name, List<Street> streets, Color color) {
+    public VehicleLine(List<VehicleStop> stops, String name, List<Street> streets, Color color, List<PathBetweenStops> stopsPath) {
         this.stops = stops;
         this.name = name;
         this.path = streets;
         this.color = color;
+        this.stopsPath = stopsPath;
     }
 
     @JsonIgnore
@@ -52,32 +50,9 @@ public class VehicleLine {
         return null;
     }
 
-    /**
-     * Returns neighboring streets by specifying street and coordinates of street end
-     * @param coords street end coordinates
-     * @return street neighbors
-     */
-    @JsonIgnore
-    private List<Street> getNeighbors(Coordinates coords) {
-        List<Street> neighbors = new ArrayList<>();
-        for(Street street : path) {
-            if((street.getFrom().equals(coords) || street.getTo().equals(coords))) {
-                if(!neighbors.contains(street)) {
-                    neighbors.add(street);
-                }
-            }
-        }
-        return neighbors;
+    public List<PathBetweenStops> getStopsPath() {
+        return stopsPath;
     }
-
-    @JsonIgnore
-    private List<Street> getNeighbors(Street street) {
-        HashSet<Street> neighbors = new HashSet<>();
-        neighbors.addAll(getNeighbors(street.getTo()));
-        neighbors.addAll(getNeighbors(street.getFrom()));
-        return new ArrayList<>(neighbors);
-    }
-
 
     /**
      * Returns path to the next stop
@@ -86,97 +61,14 @@ public class VehicleLine {
      */
     @JsonIgnore
     public Path getPathToNextStop(VehicleStop currentStop, VehicleStop nextStop) {
-        class PathInfo {
-            protected List<Coordinates> path;
-            protected Street currentStreet;
-
-            public PathInfo(List<Coordinates> path, Street currentStreet) {
-                this.path = path;
-                this.currentStreet = currentStreet;
-            }
-
-            @Override
-            public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
-                PathInfo pathInfo = (PathInfo) o;
-                return Objects.equals(path, pathInfo.path) &&
-                        Objects.equals(currentStreet, pathInfo.currentStreet);
-            }
-
-            @Override
-            public int hashCode() {
-                return Objects.hash(path, currentStreet);
+        for(PathBetweenStops path : stopsPath) {
+            if(path.getStop1() == currentStop && path.getStop2() == nextStop) {
+                return path.getPathFromStop1();
+            } else if(path.getStop2() == currentStop && path.getStop1() == nextStop) {
+                return path.getPathFromStop2();
             }
         }
-
-
-        List<Coordinates> coordinates = new ArrayList<>();
-        List<PathInfo> open = new ArrayList<>();
-        HashSet<PathInfo> found = new HashSet<>();
-
-//        int nextStopIndex = stops.indexOf(currentStop) + 1;
-//        if(nextStopIndex >= stops.size()) {
-//            nextStopIndex %= stops.size();
-//        }
-        Street nextStopStreet = getStopStreet(nextStop);
-        coordinates.add(currentStop.getCoordinates());
-        Street stopStreet = getStopStreet(currentStop);
-
-        if(stopStreet == null || nextStopStreet == null) {
-            return null;
-        }
-
-        if(nextStopStreet.equals(stopStreet)) {
-            coordinates.add(nextStop.getCoordinates());
-            return new Path(coordinates);
-        }
-
-        open.add(new PathInfo(new ArrayList<>(coordinates), stopStreet));
-        for( int i = 0; i < open.size(); i++) {
-            List<Street> neighbors = getNeighbors(open.get(i).currentStreet);
-            for(Street neighbor: neighbors) {
-                ArrayList<Coordinates> newCoordinates = new ArrayList<>(open.get(i).path);
-                Coordinates crossing = open.get(i).currentStreet.getCrossingCoordinates(neighbor);
-                if(crossing != null)
-                    newCoordinates.add(crossing);
-                PathInfo info = new PathInfo(newCoordinates, neighbor);
-                if(info.currentStreet.equals(nextStopStreet)) {
-//                    info.path.add(info.currentStreet.getCrossingCoordinates(nextStopStreet));
-                    found.add(info);
-                } else {
-                    boolean foundFlag = false;
-                    for(PathInfo openInfo : open) {
-                        if(openInfo.currentStreet.equals(info.currentStreet)) {
-                            foundFlag = true;
-                            if(openInfo.path.size() > info.path.size()) {
-                                open.remove(openInfo);
-                                open.add(info);
-                            }
-                            break;
-                        }
-                    }
-                    if(!foundFlag) {
-                        open.add(info);
-                    }
-                }
-            }
-        }
-
-        Path closest = null;
-        for(PathInfo info : found) {
-            info.path.add(nextStop.getCoordinates());
-            Path path = new Path(info.path);
-            if(closest == null) {
-                closest = path;
-            } else {
-                if(closest.getPathLenght() > path.getPathLenght()) {
-                    closest = path;
-                }
-            }
-        }
-
-        return closest;
+        return null;
     }
 
     /**
@@ -223,8 +115,6 @@ public class VehicleLine {
 
     @Override
     public String toString() {
-        return "Line{" +
-                "name='" + name + '\'' +
-                '}';
+        return name;
     }
 }

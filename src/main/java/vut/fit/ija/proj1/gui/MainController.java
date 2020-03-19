@@ -10,14 +10,9 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
-import vut.fit.ija.proj1.data.Timetable;
-import vut.fit.ija.proj1.data.TimetableEntry;
-import vut.fit.ija.proj1.data.VehicleLine;
+import vut.fit.ija.proj1.data.*;
 import vut.fit.ija.proj1.gui.elements.VehicleStop;
 import vut.fit.ija.proj1.gui.elements.Street;
 import vut.fit.ija.proj1.gui.elements.Vehicle;
@@ -29,39 +24,76 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class MainController {
+    @FXML
+    private ListView<VehicleLine> lineListView;
+    @FXML
+    private ListView<VehicleStop> stopListView;
+    @FXML
+    private ListView<LineModifySidePanel.EditablePathBetweenStops> pathListView;
+    @FXML
+    private Label applicationState;
+    @FXML
+    private CheckBox streetClosed;
+    @FXML
+    private AnchorPane lineModifySidePanelContainer;
+    @FXML
+    private Slider traffic;
+    @FXML
+    private AnchorPane streetConfig;
+    @FXML
+    private TextField timeScale;
+    @FXML
+    private Button setTimeScaleButton;
+    @FXML
+    private Label time;
+    @FXML
+    private ListView<TimetableEntry> listView;
+    @FXML
+    private ScrollPane scroll;
+    @FXML
+    private Pane content;
+
     private LocalTime localTime = LocalTime.now();
     private Timer timer;
     private Shape selectedShape;
     private List<Vehicle> vehicles;
     private List<Street> streets;
+    private List<VehicleLine> lines;
+
+    private ApplicationState state = ApplicationState.VIEW;
+    private LineModifySidePanel lineModifySidePanel;
 
     private ChangeListener<Number> trafficListener;
     private ChangeListener<Boolean> closedListener;
 
+    private Street.OnStreetSelect defaultOnStreetSelectListener = selectedStreet -> {
+        deselectItem();
+        streetConfig.setVisible(true);
 
-    @FXML
-    private CheckBox streetClosed;
+        traffic.setValue(selectedStreet.getTraffic());
+        streetClosed.setSelected(selectedStreet.isClosed());
 
-    @FXML
-    private Slider traffic;
+        trafficListener = (observable, oldValue, newValue) -> {
+            selectedStreet.setTraffic(newValue.doubleValue());
+        };
 
-    @FXML
-    private AnchorPane streetConfig;
+        traffic.valueProperty().addListener(trafficListener);
 
-    @FXML
-    private TextField timeScale;
+        closedListener = (observable, oldValue, newValue) -> {
+            selectedStreet.setClosed(newValue);
+        };
 
-    @FXML
-    private Label time;
+        streetClosed.selectedProperty().addListener(closedListener);
 
-    @FXML
-    private ListView<TimetableEntry> listView;
+        Line line = new Line(selectedStreet.getFrom().getX(), selectedStreet.getFrom().getY(),
+                selectedStreet.getTo().getX(), selectedStreet.getTo().getY());
 
-    @FXML
-    private ScrollPane scroll;
+        line.setStroke(Color.valueOf("#d32f2f"));
+        line.setStrokeWidth(3);
 
-    @FXML
-    private Pane content;
+        selectedShape = line;
+        content.getChildren().add(line);
+    };
 
     @FXML
     private void onStackPaneScroll(ScrollEvent e) {
@@ -92,6 +124,10 @@ public class MainController {
         }
         timer.cancel();
         startTime(scale);
+    }
+
+    public void setLines(List<VehicleLine> lines) {
+        this.lines = lines;
     }
 
     public void setVehicles(List<Vehicle> vehicles) {
@@ -131,63 +167,92 @@ public class MainController {
         streetConfig.setVisible(false);
     }
 
-    private void setVehicleCallbacks() {
+    private void setVehicleOnSelectCallback(Vehicle.OnVehicleSelectListener callback) {
         for (Vehicle vehicle :
                 vehicles) {
-            vehicle.setOnSelectListener(vehicle1 -> {
-                deselectItem();
-                listView.setVisible(true);
+            vehicle.setOnSelectListener(callback);
+        }
+    }
 
-                listView.setItems(FXCollections.observableArrayList(vehicle1.getTimetable().getEntries()));
-                Shape shape = vehicle1.getLine().getGui();
-                selectedShape = shape;
-                content.getChildren().add(shape);
+    private void setStreetClosedCallback() {
+        for (Street street : streets) {
+            street.setClosedListener(closedStreet -> {
+                boolean flagInvalid = false;
+                //Check vehicle paths for closed street
+                for(VehicleLine line : lines) {
+                    for(PathBetweenStops path : line.getStopsPath()) {
+                        if(path.getStreetPath().contains(closedStreet)) {
+                            flagInvalid = true;
+                            path.setInvalid(true);
+                        }
+                    }
+                }
+                if(flagInvalid) {
+                    changeApplicationMode(ApplicationState.LINE_MODIFY);
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Street closing");
+                    alert.setHeaderText("Street closing");
+                    alert.setContentText("By closing this street, some lines have invalid paths." +
+                                    "Modify them in line modify mode");
+                    alert.showAndWait();
+
+                    deselectItem();
+                }
             });
         }
     }
 
-    private void setStreetCallbacks() {
+    private void setStreetOnClickCallback(Street.OnStreetSelect callback) {
         for (Street street : streets) {
-            street.setOnSelectListener((selectedStreet) -> {
-                deselectItem();
-                streetConfig.setVisible(true);
+            street.setOnSelectListener(callback);
+        }
+    }
 
-                traffic.setValue(selectedStreet.getTraffic());
-                streetClosed.setSelected(street.isClosed());
+    private void changeApplicationMode(ApplicationState newMode) {
+        state = newMode;
+        switch(newMode) {
+            case VIEW:
+                setStreetOnClickCallback(defaultOnStreetSelectListener);
+                timeScale.setDisable(true);
+                setTimeScaleButton.setDisable(false);
+                scroll.setStyle(
+                        "-fx-border-color: #32681d;" +
+                        "-fx-border-width: 3;"
+                );
+                applicationState.setText("View");
+                applicationState.setTextFill(Color.valueOf("#32681d"));
+                break;
 
-                trafficListener = (observable, oldValue, newValue) -> {
-                    selectedStreet.setTraffic(newValue.doubleValue());
-                };
-
-                traffic.valueProperty().addListener(trafficListener);
-
-                closedListener = (observable, oldValue, newValue) -> {
-                    selectedStreet.setClosed(newValue);
-                };
-
-                streetClosed.selectedProperty().addListener(closedListener);
-
-                Line line = new Line(selectedStreet.getFrom().getX(), selectedStreet.getFrom().getY(),
-                        selectedStreet.getTo().getX(), selectedStreet.getTo().getY());
-
-                line.setStroke(Color.valueOf("#d32f2f"));
-                line.setStrokeWidth(3);
-
-                selectedShape = line;
-                content.getChildren().add(line);
-            });
+            case LINE_MODIFY:
+                setStreetOnClickCallback(lineModifySidePanel.getOnStreetSelectListener());
+                lineModifySidePanelContainer.setVisible(true);
+                listView.setVisible(false);
+                streetConfig.setVisible(false);
+                timeScale.setDisable(true);
+                setTimeScaleButton.setDisable(true);
+                scroll.setStyle(
+                        "-fx-border-color: #bf360c;" +
+                        "-fx-border-width: 3;"
+                );
+                applicationState.setText("Line Modify");
+                applicationState.setTextFill(Color.valueOf("#bf360c"));
+                break;
         }
     }
 
     public void setCallbacks() {
-        setVehicleCallbacks();
-        setStreetCallbacks();
-    }
+        setVehicleOnSelectCallback(vehicle -> {
+            deselectItem();
+            listView.setVisible(true);
 
-    @FXML
-    public void onDebug() {
-        VehicleLine line = vehicles.get(1).getLine();
-        content.getChildren().add(line.getPathToNextStop(line.getStops().get(4), line.getStops().get(0)).getShape());
+            listView.setItems(FXCollections.observableArrayList(vehicle.getTimetable().getEntries()));
+            Shape shape = vehicle.getLine().getGui();
+            selectedShape = shape;
+            content.getChildren().add(shape);
+        });
+
+        setStreetOnClickCallback(defaultOnStreetSelectListener);
+        setStreetClosedCallback();
     }
 
     public void startTime(float scale) {
@@ -195,14 +260,20 @@ public class MainController {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                Platform.runLater(() -> {
-                    localTime = localTime.plusSeconds(1);
-                    time.setText(localTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")));
-                    for (Vehicle vehicle : vehicles) {
-                        vehicle.drive(localTime);
-                    }
-                });
+                if(state == ApplicationState.VIEW) {
+                    Platform.runLater(() -> {
+                        localTime = localTime.plusSeconds(1);
+                        time.setText(localTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+                        for (Vehicle vehicle : vehicles) {
+                            vehicle.drive(localTime);
+                        }
+                    });
+                }
             }
         }, 0, (long) (1000 / scale));
+    }
+
+    public void setupLineModify() {
+        lineModifySidePanel = new LineModifySidePanel(content, lineListView, stopListView, pathListView, lines);
     }
 }

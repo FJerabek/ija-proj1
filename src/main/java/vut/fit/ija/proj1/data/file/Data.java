@@ -38,4 +38,14 @@ public class Data {
     public List<Vehicle> getVehicles() {
         return vehicles;
     }
+
+    @Override
+    public String toString() {
+        return "Data{" +
+                "stops=" + stops +
+                ", streets=" + streets +
+                ", lines=" + lines +
+                ", vehicles=" + vehicles +
+                '}';
+    }
 }

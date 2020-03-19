@@ -2,24 +2,49 @@ package vut.fit.ija.proj1.data;
 
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
+import org.graalvm.compiler.graph.Position;
+import vut.fit.ija.proj1.data.exceptions.StreetsNotConnectedException;
 import vut.fit.ija.proj1.gui.elements.VehicleStop;
 import vut.fit.ija.proj1.gui.elements.Street;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Class representing path in the map
  */
 public class Path {
+    private Coordinates startCoordinates;
+    private Coordinates stopCoordinates;
     private List<Coordinates> path;
     private List<Street> streets;
 
     /**
      * Constructs a new path
-     * @param path list of path coordinates
      */
-    public Path(List<Coordinates> path) {
-        this.path = path;
+    public Path(Coordinates startCoordinates, Coordinates stopCoordinates, List<Street> streets) throws StreetsNotConnectedException {
+        this.startCoordinates = startCoordinates;
+        this.stopCoordinates = stopCoordinates;
+        this.streets = streets;
+
+        path = constructPath();
+    }
+
+    private List<Coordinates> constructPath() throws StreetsNotConnectedException {
+        ArrayList<Coordinates> path = new ArrayList<>();
+        path.add(startCoordinates);
+        for(int i = 0; i < streets.size() - 1; i++) {
+            Coordinates crossing = streets.get(i).getCrossingCoordinates(streets.get(i + 1));
+
+            if(crossing != null){
+                path.add(crossing);
+            } else {
+              throw new StreetsNotConnectedException("Provided path does not have connecting streets");
+            }
+        }
+        path.add(stopCoordinates);
+        return path;
     }
 
     /**
@@ -27,20 +52,21 @@ public class Path {
      * @param distance distance
      * @return coordinates on path at set distance
      */
-    public Coordinates getCoordinatesByDistance(double distance) {
+    public PositionInfo getCoordinatesByDistance(double distance) {
         if(path.size() == 1) {
-            return path.get(0);
+            return new PositionInfo(path.get(0), streets.get(0));
         } else if(path.size() == 0){
             return null;
         }
         if(distance >= getPathLenght()) {
-            return path.get(path.size() - 1);
+            return new PositionInfo(path.get(path.size() - 1), streets.get(streets.size() - 1));
         }
         Coordinates a = null;
         Coordinates b = null;
         double length = 0;
         double currentLength = 0;
-        for(int i = 0; i < path.size() - 1; i++) {
+        int i;
+        for(i = 0; i < path.size() - 1; i++) {
             a = path.get(i);
             b = path.get(i+1);
             currentLength=Math.sqrt(Math.pow(Math.abs(a.getX() - b.getX()),2) + Math.pow(Math.abs(a.getY() - b.getY()),2));
@@ -51,7 +77,10 @@ public class Path {
         }
 
         double driven = (distance - length) / currentLength;
-        return new Coordinates(a.getX() + (b.getX() - a.getX())*driven, a.getY() + (b.getY() - a.getY())*driven);
+        return new PositionInfo(
+                new Coordinates(a.getX() + (b.getX() - a.getX())*driven, a.getY() + (b.getY() - a.getY())*driven),
+                streets.get(i)
+        );
     }
 
     /**
@@ -89,25 +118,5 @@ public class Path {
             length+=Math.sqrt(Math.pow(Math.abs(a.getX() - b.getX()),2) + Math.pow(Math.abs(a.getY() - b.getY()),2));
         }
         return length;
-    }
-    private static Coordinates getNextCoordinates(Coordinates current, Street nextStreet) {
-        return nextStreet.getFrom().equals(current)? nextStreet.getTo() : nextStreet.getFrom();
-    }
-
-    /**
-     * Returns stop if there is a stop on specified coordinates, null otherwise;
-     * @param coordinates stop coordinates
-     * @param streets all streets on map
-     * @return stop if there is a stop, null otherwise
-     */
-    private static VehicleStop getStopByCoordinates(Coordinates coordinates, List<Street> streets) {
-        for(Street street : streets) {
-            for(VehicleStop stop : street.getStops()) {
-                if (stop.getCoordinates().equals(coordinates)) {
-                    return stop;
-                }
-            }
-        }
-        return null;
     }
 }

@@ -46,11 +46,15 @@ public class MainApplication extends Application {
         try {
             Data loaded = loadMapLayout(new java.io.File("test.yml"));
             MainController controller = loader.getController();
+
+            controller.setLines(loaded.getLines());
             controller.drawStreets(loaded.getStreets());
             controller.drawStops(loaded.getStops());
             controller.setVehicles(loaded.getVehicles());
             controller.setCallbacks();
             controller.startTime(1);
+
+            controller.setupLineModify();
         } catch (IOException e) {
             e.printStackTrace();
         }

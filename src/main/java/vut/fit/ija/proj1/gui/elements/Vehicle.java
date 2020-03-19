@@ -11,6 +11,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import vut.fit.ija.proj1.data.*;
+import vut.fit.ija.proj1.data.exceptions.StreetsNotConnectedException;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -148,7 +149,8 @@ public class Vehicle implements Drawable {
         if(distance < 0)
             return;
 
-        Coordinates coords = path.getCoordinatesByDistance(distance);
+        PositionInfo info = path.getCoordinatesByDistance(distance);
+        Coordinates coords = info.getCoordinates();
         moveGuiPoint(coords.getX() - position.getX(), coords.getY() - position.getY());
         position = coords;
     }

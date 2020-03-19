@@ -29,6 +29,8 @@ public class Street implements Drawable {
     private double traffic = 0;
     @JsonIgnore
     private List<Shape> gui;
+    @JsonIgnore
+    private OnStreetClosed closedListener;
 
     public Street() {
     }
@@ -96,6 +98,15 @@ public class Street implements Drawable {
                 }
             }
         });
+        if(closed) {
+            if (closedListener != null) {
+                closedListener.onClosed(this);
+            }
+        }
+    }
+
+    public void setClosedListener(OnStreetClosed closedListener) {
+        this.closedListener = closedListener;
     }
 
     public void setOnSelectListener(OnStreetSelect listener) {
@@ -187,6 +198,10 @@ public class Street implements Drawable {
 
     public interface OnStreetSelect{
         void onSelect(Street street);
+    }
+
+    public interface OnStreetClosed {
+        void onClosed(Street street);
     }
 
     static class StreetSanitizer extends StdConverter<Street, Street> {
