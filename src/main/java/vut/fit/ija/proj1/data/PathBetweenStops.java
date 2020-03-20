@@ -28,6 +28,7 @@ public class PathBetweenStops {
     private Path stop2Path;
     @JsonIgnore
     private boolean invalid;
+    private int delay;
 
     public PathBetweenStops() {
     }
@@ -69,6 +70,14 @@ public class PathBetweenStops {
         List<Street> reversedPath = new ArrayList<>(streetPath);
         Collections.reverse(reversedPath);
         return new Path(stop2.getCoordinates(), stop1.getCoordinates(), reversedPath);
+    }
+
+    public int getDelay() {
+        return delay;
+    }
+
+    public void setDelay(int delay) {
+        this.delay = delay;
     }
 
     public Path getPathFromStop1() {

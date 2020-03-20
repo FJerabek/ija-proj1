@@ -179,18 +179,9 @@ public class Street implements Drawable {
     }
 
     private void jacksonPostConstruct() {
-        Text x = new Text(from.getX() + 10, from.getY() + 20, String.format("x: %s\ny: %s", from.getX(), from.getY()));
-        Text y = new Text(to.getX() + 10, to.getY() + 20, String.format("x: %s\ny: %s", to.getX(), to.getY()));
-        Font font = x.getFont();
-        font = Font.font(font.getFamily(), 8);
-        x.setFont(font);
-        y.setFont(font);
-
 
         gui = Arrays.asList(
                 new Text(getCoordinates().getX(), getCoordinates().getY(), name),
-                x,
-                y,
                 new Line(from.getX(), from.getY(), to.getX(), to.getY())
         );
     }

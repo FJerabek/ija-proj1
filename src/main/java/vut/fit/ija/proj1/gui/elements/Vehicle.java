@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.util.StdConverter;
+import javafx.scene.control.Tooltip;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import vut.fit.ija.proj1.data.*;
-import vut.fit.ija.proj1.data.exceptions.StreetsNotConnectedException;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -36,6 +36,10 @@ public class Vehicle implements Drawable {
     private Path path;
     @JsonIgnore
     private List<Shape> gui;
+    @JsonIgnore
+    private Tooltip tooltip;
+    @JsonIgnore
+    private int delay = 0;
 
     public Vehicle() {
     }
@@ -50,18 +54,20 @@ public class Vehicle implements Drawable {
         this.timetable = timetable;
         this.line = line;
 
-        Circle circle = new Circle(position.getX(), position.getY(), 7, line.getColor());
-        Text text = new Text(position.getX() + 7, position.getY() + 4, line.getName());
-        text.setFont(Font.font(text.getFont().getFamily(), FontWeight.BOLD, 15));
-        gui = new ArrayList<>();
-        gui.add(circle);
-        gui.add(text);
+        createGui();
     }
 
     private void postConstruct() {
         this.position = timetable.getEntries().get(0).getStop().getCoordinates();
+        createGui();
+    }
+
+    public void createGui() {
+        tooltip = new Tooltip(String.format("Delay: %s\nNext stop: %s", delay, nextEntry != null? nextEntry.getStop(): ""));
         Circle circle = new Circle(position.getX(), position.getY(), 7, line.getColor());
         Text text = new Text(position.getX() + 7, position.getY() + 4, line.getName());
+        Tooltip.install(circle, tooltip);
+        Tooltip.install(text, tooltip);
         text.setFont(Font.font(text.getFont().getFamily(), FontWeight.BOLD, 15));
         gui = new ArrayList<>();
         gui.add(circle);
@@ -108,19 +114,21 @@ public class Vehicle implements Drawable {
      */
     public void drive(LocalTime time) {
         if(currentStop == null) {
-            currentStop = timetable.getPreviousEntry(time);
+            currentStop = timetable.getPreviousEntry(time, getLine().getStops());
             if(currentStop == null)
                 return;
         }
         if(nextEntry == null) {
-            nextEntry = timetable.getNextEntry(time);
+            nextEntry = timetable.getNextEntry(time, getLine().getStops());
             if(nextEntry == null) {
                 return;
             }
+            //Update tooltip
+            tooltip.setText(String.format("Delay: %s\nNext stop: %s", delay, nextEntry != null? nextEntry.getStop(): ""));
         }
         if(time.isAfter(nextEntry.getTime())) {
             currentStop = nextEntry;
-            nextEntry = timetable.getNextEntry(time);
+            nextEntry = timetable.getNextEntry(time, getLine().getStops());
             if(nextEntry == null) {
                 if(timetable.getEntries().size() > 0)
                     nextEntry = timetable.getEntries().get(0);
@@ -144,12 +152,11 @@ public class Vehicle implements Drawable {
                 return;
             }
         }
-
         double distance = getDrivenDistanceByTime(currentStop.getTime(), time, nextEntry.getTime(), path.getPathLenght());
         if(distance < 0)
             return;
 
-        PositionInfo info = path.getCoordinatesByDistance(distance);
+        PositionInfo info = path.getPathInfoByDistance(distance);
         Coordinates coords = info.getCoordinates();
         moveGuiPoint(coords.getX() - position.getX(), coords.getY() - position.getY());
         position = coords;

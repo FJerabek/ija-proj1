@@ -36,7 +36,6 @@ public class Path {
         path.add(startCoordinates);
         for(int i = 0; i < streets.size() - 1; i++) {
             Coordinates crossing = streets.get(i).getCrossingCoordinates(streets.get(i + 1));
-
             if(crossing != null){
                 path.add(crossing);
             } else {
@@ -52,7 +51,7 @@ public class Path {
      * @param distance distance
      * @return coordinates on path at set distance
      */
-    public PositionInfo getCoordinatesByDistance(double distance) {
+    public PositionInfo getPathInfoByDistance(double distance) {
         if(path.size() == 1) {
             return new PositionInfo(path.get(0), streets.get(0));
         } else if(path.size() == 0){

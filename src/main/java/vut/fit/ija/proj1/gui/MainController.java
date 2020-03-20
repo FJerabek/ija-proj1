@@ -29,7 +29,7 @@ public class MainController {
     @FXML
     private ListView<VehicleStop> stopListView;
     @FXML
-    private ListView<LineModifySidePanel.EditablePathBetweenStops> pathListView;
+    private ListView<PathBetweenStops> pathListView;
     @FXML
     private Label applicationState;
     @FXML
@@ -52,6 +52,8 @@ public class MainController {
     private ScrollPane scroll;
     @FXML
     private Pane content;
+    @FXML
+    private Button exitLineEditModeButton;
 
     private LocalTime localTime = LocalTime.now();
     private Timer timer;
@@ -61,7 +63,7 @@ public class MainController {
     private List<VehicleLine> lines;
 
     private ApplicationState state = ApplicationState.VIEW;
-    private LineModifySidePanel lineModifySidePanel;
+    private LineModifyMode lineModifyMode;
 
     private ChangeListener<Number> trafficListener;
     private ChangeListener<Boolean> closedListener;
@@ -128,7 +130,10 @@ public class MainController {
 
     @FXML
     public void onExitLineEdit() {
-        changeApplicationMode(ApplicationState.VIEW);
+        if(lineModifyMode.canExit()) {
+            lineModifyMode.clean();
+            changeApplicationMode(ApplicationState.VIEW);
+        }
     }
 
     public void setLines(List<VehicleLine> lines) {
@@ -232,7 +237,7 @@ public class MainController {
                 break;
 
             case LINE_MODIFY:
-                setStreetOnClickCallback(lineModifySidePanel.getOnStreetSelectListener());
+                setStreetOnClickCallback(lineModifyMode.getOnStreetSelectListener());
                 lineListView.refresh();
                 lineModifySidePanelContainer.setVisible(true);
                 listView.setVisible(false);
@@ -283,6 +288,7 @@ public class MainController {
     }
 
     public void setupLineModify() {
-        lineModifySidePanel = new LineModifySidePanel(content, lineListView, stopListView, pathListView, lines);
+        lineModifyMode = new LineModifyMode(content, lineListView, stopListView, pathListView, lines, exitLineEditModeButton);
+
     }
 }
