@@ -5,6 +5,7 @@ import javafx.scene.shape.Shape;
 import vut.fit.ija.proj1.data.exceptions.StreetsNotConnectedException;
 import vut.fit.ija.proj1.gui.elements.Street;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,12 +17,12 @@ public class Path {
     private Coordinates stopCoordinates;
     private List<Coordinates> path;
     private List<Street> streets;
-    private int delay;
+    private Duration delay;
 
     /**
      * Constructs a new path
      */
-    public Path(Coordinates startCoordinates, Coordinates stopCoordinates, List<Street> streets, int delay) throws StreetsNotConnectedException {
+    public Path(Coordinates startCoordinates, Coordinates stopCoordinates, List<Street> streets, Duration delay) throws StreetsNotConnectedException {
         this.startCoordinates = startCoordinates;
         this.stopCoordinates = stopCoordinates;
         this.streets = streets;
@@ -44,7 +45,7 @@ public class Path {
         return path;
     }
 
-    public int getDelay() {
+    public Duration getDelay() {
         return delay;
     }
 

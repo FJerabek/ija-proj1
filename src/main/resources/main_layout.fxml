@@ -60,7 +60,7 @@
                </AnchorPane>
                <AnchorPane fx:id="streetConfig" layoutX="6.0" layoutY="148.0" prefHeight="200.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="120.0">
                   <children>
-                     <Slider fx:id="traffic" layoutX="63.0" layoutY="14.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="40.0" />
+                     <Slider fx:id="traffic" layoutX="63.0" layoutY="14.0" max="1.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="40.0" />
                      <Label layoutX="14.0" layoutY="14.0" text="Traffic" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="40.0" />
                      <CheckBox fx:id="streetClosed" layoutX="14.0" layoutY="40.0" mnemonicParsing="false" text="Closed" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="65.0" />
                      <Label alignment="CENTER" layoutX="18.0" layoutY="14.0" text="Street configuration" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">

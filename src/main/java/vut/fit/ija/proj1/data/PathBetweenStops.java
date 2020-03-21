@@ -10,6 +10,7 @@ import vut.fit.ija.proj1.data.exceptions.StreetsNotConnectedException;
 import vut.fit.ija.proj1.gui.elements.Street;
 import vut.fit.ija.proj1.gui.elements.VehicleStop;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,12 +29,12 @@ public class PathBetweenStops {
     private Path stop2Path;
     @JsonIgnore
     private boolean invalid;
-    private int delay;
+    private Duration delay = Duration.ofSeconds(0);
 
     public PathBetweenStops() {
     }
 
-    public PathBetweenStops(VehicleStop stop1, VehicleStop stop2, List<Street> streetPath, int delay) throws StreetsNotConnectedException {
+    public PathBetweenStops(VehicleStop stop1, VehicleStop stop2, List<Street> streetPath, Duration delay) throws StreetsNotConnectedException {
         this.stop1 = stop1;
         this.stop2 = stop2;
         this.streetPath = streetPath;
@@ -73,7 +74,7 @@ public class PathBetweenStops {
         return new Path(stop2.getCoordinates(), stop1.getCoordinates(), reversedPath, delay);
     }
 
-    public int getDelay() {
+    public Duration getDelay() {
         return delay;
     }
 

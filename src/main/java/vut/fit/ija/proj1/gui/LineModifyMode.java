@@ -14,6 +14,7 @@ import vut.fit.ija.proj1.data.exceptions.StreetsNotConnectedException;
 import vut.fit.ija.proj1.gui.elements.Street;
 import vut.fit.ija.proj1.gui.elements.VehicleStop;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -86,7 +87,7 @@ public class LineModifyMode {
                             currentEdit.getStop1().equals(targetStop)? currentEdit.getStop2() : currentEdit.getStop1(),
                             targetStop,
                             path,
-                            getNewPathDelay()
+                            Duration.ofSeconds(getNewPathDelay())
                     );
                 } catch (StreetsNotConnectedException e) {
                     e.printStackTrace();

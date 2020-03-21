@@ -2,6 +2,7 @@ package vut.fit.ija.proj1.gui.elements;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.util.StdConverter;
@@ -13,6 +14,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import vut.fit.ija.proj1.data.*;
 
+import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +32,8 @@ public class Vehicle implements Drawable {
     private TimetableEntry currentStop;
     private VehicleLine line;
     private Timetable timetable;
-    private double speed = 1;
+    @JsonProperty("speed")
+    private double speed = 0.5;
     @JsonIgnore
     private TimetableEntry nextEntry;
     @JsonIgnore
@@ -40,9 +43,11 @@ public class Vehicle implements Drawable {
     @JsonIgnore
     private Tooltip tooltip;
     @JsonIgnore
-    private int delay = 0;
+    private Duration delay = Duration.ofSeconds(0);
     @JsonIgnore
     private double drivenDistance = 0;
+    @JsonIgnore
+    private boolean inStop = false;
 
     public Vehicle() {
     }
@@ -115,13 +120,20 @@ public class Vehicle implements Drawable {
         tooltip.setText(String.format("Delay: %s\nNext stop: %s", delay, nextEntry != null? nextEntry.getStop(): ""));
     }
 
+    public double getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(double speed) {
+        this.speed = speed;
+    }
 
     /**
      * Updates vehicle position according to time and its timetable
      * @param time current time
      */
     public void drive(LocalTime time) {
-//        time = time.minusSeconds(delay);
+        time = time.minus(delay);
         if(currentStop == null) {
             currentStop = timetable.getPreviousEntry(time, getLine().getStops());
             if(currentStop == null)
@@ -134,21 +146,25 @@ public class Vehicle implements Drawable {
             }
             updateTooltip();
         }
-        if(time.isAfter(nextEntry.getTime().plusSeconds(delay))) {
+        if((time.isAfter(nextEntry.getTime().plus(path != null? path.getDelay() : Duration.ofSeconds(0))) ||
+                //Or time is 12 hours after current time because of midnight
+                Math.abs(time.toSecondOfDay() - nextEntry.getTime().toSecondOfDay()) > LocalTime.of(12,0).toSecondOfDay())
+                        && inStop) {
+            delay = Duration.ofSeconds(time.toSecondOfDay() - nextEntry.getTime().toSecondOfDay());
             currentStop = nextEntry;
-            nextEntry = timetable.getNextEntry(time, getLine().getStops());
+            System.out.println(String.format("Delay: %s Time: %s Delayed time: %s", delay, time, time.minus(delay)));
+            nextEntry = timetable.getNextEntry(time.minus(delay), getLine().getStops());
             if(nextEntry == null) {
                 if(timetable.getEntries().size() > 0)
                     nextEntry = timetable.getEntries().get(0);
                 else
                     return;
             }
-            if(path != null) {
-                System.out.println(path.getDelay());
-                delay += path.getDelay();
-            }
             path = line.getPathToNextStop(currentStop.getStop(), nextEntry.getStop());
-            drivenDistance = 0;
+            if(path != null) {
+                inStop = false;
+                drivenDistance = 0;
+            }
             updateTooltip();
         }
 
@@ -162,23 +178,27 @@ public class Vehicle implements Drawable {
 
         if(path == null) {
             path = line.getPathToNextStop(currentStop.getStop(), nextEntry.getStop());
+            drivenDistance = getDrivenDistanceByTime(currentStop.getTime(), time, nextEntry.getTime().plus(path.getDelay()), path.getPathLenght());
+            inStop = false;
             if(path == null) {
                 return;
             }
         }
-//        double distance = getDrivenDistanceByTime(currentStop.getTime(), time, nextEntry.getTime().plusSeconds(path.getDelay()), path.getPathLenght());
-        drivenDistance += speed;
+
+        PositionInfo info = path.getPathInfoByDistance(drivenDistance);
+        if(!inStop) {
+            System.out.println(speed * (1 - info.getStreet().getTraffic()));
+            drivenDistance += speed * (1 - info.getStreet().getTraffic());
+        }
+
+        if(drivenDistance > path.getPathLenght()) {
+            inStop = true;
+        }
+
         if(drivenDistance < 0)
             return;
 
-        PositionInfo info = path.getPathInfoByDistance(drivenDistance);
-        double traffic = info.getStreet().getTraffic();
-        if(traffic > 0) {
-            if(Math.random() < traffic) {
-                delay+=1;
-                updateTooltip();
-            }
-        }
+        info = path.getPathInfoByDistance(drivenDistance);
         Coordinates coords = info.getCoordinates();
         moveGuiPoint(coords.getX() - position.getX(), coords.getY() - position.getY());
         position = coords;
