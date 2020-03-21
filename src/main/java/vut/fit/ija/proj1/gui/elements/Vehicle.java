@@ -30,6 +30,7 @@ public class Vehicle implements Drawable {
     private TimetableEntry currentStop;
     private VehicleLine line;
     private Timetable timetable;
+    private double speed = 1;
     @JsonIgnore
     private TimetableEntry nextEntry;
     @JsonIgnore
@@ -40,6 +41,8 @@ public class Vehicle implements Drawable {
     private Tooltip tooltip;
     @JsonIgnore
     private int delay = 0;
+    @JsonIgnore
+    private double drivenDistance = 0;
 
     public Vehicle() {
     }
@@ -108,11 +111,17 @@ public class Vehicle implements Drawable {
     }
 
 
+    private void updateTooltip() {
+        tooltip.setText(String.format("Delay: %s\nNext stop: %s", delay, nextEntry != null? nextEntry.getStop(): ""));
+    }
+
+
     /**
      * Updates vehicle position according to time and its timetable
      * @param time current time
      */
     public void drive(LocalTime time) {
+//        time = time.minusSeconds(delay);
         if(currentStop == null) {
             currentStop = timetable.getPreviousEntry(time, getLine().getStops());
             if(currentStop == null)
@@ -123,10 +132,9 @@ public class Vehicle implements Drawable {
             if(nextEntry == null) {
                 return;
             }
-            //Update tooltip
-            tooltip.setText(String.format("Delay: %s\nNext stop: %s", delay, nextEntry != null? nextEntry.getStop(): ""));
+            updateTooltip();
         }
-        if(time.isAfter(nextEntry.getTime())) {
+        if(time.isAfter(nextEntry.getTime().plusSeconds(delay))) {
             currentStop = nextEntry;
             nextEntry = timetable.getNextEntry(time, getLine().getStops());
             if(nextEntry == null) {
@@ -135,7 +143,13 @@ public class Vehicle implements Drawable {
                 else
                     return;
             }
+            if(path != null) {
+                System.out.println(path.getDelay());
+                delay += path.getDelay();
+            }
             path = line.getPathToNextStop(currentStop.getStop(), nextEntry.getStop());
+            drivenDistance = 0;
+            updateTooltip();
         }
 
         if(currentStop != null && nextEntry != null) {
@@ -152,11 +166,19 @@ public class Vehicle implements Drawable {
                 return;
             }
         }
-        double distance = getDrivenDistanceByTime(currentStop.getTime(), time, nextEntry.getTime(), path.getPathLenght());
-        if(distance < 0)
+//        double distance = getDrivenDistanceByTime(currentStop.getTime(), time, nextEntry.getTime().plusSeconds(path.getDelay()), path.getPathLenght());
+        drivenDistance += speed;
+        if(drivenDistance < 0)
             return;
 
-        PositionInfo info = path.getPathInfoByDistance(distance);
+        PositionInfo info = path.getPathInfoByDistance(drivenDistance);
+        double traffic = info.getStreet().getTraffic();
+        if(traffic > 0) {
+            if(Math.random() < traffic) {
+                delay+=1;
+                updateTooltip();
+            }
+        }
         Coordinates coords = info.getCoordinates();
         moveGuiPoint(coords.getX() - position.getX(), coords.getY() - position.getY());
         position = coords;

@@ -1,6 +1,5 @@
 plugins {
     id 'application'
-    id 'org.openjfx.javafxplugin' version '0.0.8'
 }
 
 group 'org.example'
@@ -8,22 +7,20 @@ version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
 
-javafx {
-    version = "13"
-    modules = [ 'javafx.controls', 'javafx.fxml' ]
-}
-
-
 mainClassName = "vut.fit.ija.proj1.Runner"
 
 repositories {
     mavenCentral()
 }
 
+
 dependencies {
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.9.9'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9'
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.9.9'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.9'
+}
+
+task copyToLib(type: Copy) {
+    into "libs"
+    from configurations.runtimeClasspath
 }

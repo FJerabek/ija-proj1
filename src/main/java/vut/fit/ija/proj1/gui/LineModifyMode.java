@@ -85,14 +85,14 @@ public class LineModifyMode {
                     pathBetweenStops = new PathBetweenStops(
                             currentEdit.getStop1().equals(targetStop)? currentEdit.getStop2() : currentEdit.getStop1(),
                             targetStop,
-                            path
+                            path,
+                            getNewPathDelay()
                     );
                 } catch (StreetsNotConnectedException e) {
                     e.printStackTrace();
                 }
 
                 assert pathBetweenStops != null;
-                pathBetweenStops.setDelay(getNewPathDelay());
 
                 //Update line path between stops
                 currentEditLine.getStopsPath().remove(currentEdit);

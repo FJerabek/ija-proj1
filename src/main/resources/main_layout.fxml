@@ -15,7 +15,7 @@
 <?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="775.0" prefWidth="1099.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vut.fit.ija.proj1.gui.MainController">
-   <BorderPane prefHeight="775.0" prefWidth="1099.0">
+   <BorderPane prefHeight="775.0" prefWidth="1099.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <center>
            <ScrollPane fx:id="scroll" pannable="true" prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: #33691e; -fx-border-width: 3;" BorderPane.alignment="CENTER">
                <StackPane fx:id="stackPane" onMouseClicked="#onClicked" onScroll="#onStackPaneScroll" prefHeight="438.0" prefWidth="500.0">

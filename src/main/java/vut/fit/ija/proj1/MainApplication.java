@@ -2,6 +2,7 @@ package vut.fit.ija.proj1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -10,7 +11,9 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import vut.fit.ija.proj1.data.file.ColorDeserializer;
 import vut.fit.ija.proj1.data.file.Data;
 import vut.fit.ija.proj1.gui.MainController;
 
@@ -65,6 +68,9 @@ public class MainApplication extends Application {
         ObjectMapper mapper = new ObjectMapper(factory);
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         mapper.registerModule(new JavaTimeModule());
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(Color.class, new ColorDeserializer());
+        mapper.registerModule(module);
         return mapper.readValue(file, Data.class);
     }
 

@@ -33,10 +33,11 @@ public class PathBetweenStops {
     public PathBetweenStops() {
     }
 
-    public PathBetweenStops(VehicleStop stop1, VehicleStop stop2, List<Street> streetPath) throws StreetsNotConnectedException {
+    public PathBetweenStops(VehicleStop stop1, VehicleStop stop2, List<Street> streetPath, int delay) throws StreetsNotConnectedException {
         this.stop1 = stop1;
         this.stop2 = stop2;
         this.streetPath = streetPath;
+        this.delay = delay;
 
         stop1Path = createPathFromStop1();
         stop2Path = createPathFromStop2();
@@ -63,21 +64,17 @@ public class PathBetweenStops {
     }
 
     private Path createPathFromStop1() throws StreetsNotConnectedException {
-        return new Path(stop1.getCoordinates(), stop2.getCoordinates(), streetPath);
+        return new Path(stop1.getCoordinates(), stop2.getCoordinates(), streetPath, delay);
     }
 
     private Path createPathFromStop2() throws StreetsNotConnectedException {
         List<Street> reversedPath = new ArrayList<>(streetPath);
         Collections.reverse(reversedPath);
-        return new Path(stop2.getCoordinates(), stop1.getCoordinates(), reversedPath);
+        return new Path(stop2.getCoordinates(), stop1.getCoordinates(), reversedPath, delay);
     }
 
     public int getDelay() {
         return delay;
-    }
-
-    public void setDelay(int delay) {
-        this.delay = delay;
     }
 
     public Path getPathFromStop1() {

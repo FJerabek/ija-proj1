@@ -2,13 +2,10 @@ package vut.fit.ija.proj1.data;
 
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
-import org.graalvm.compiler.graph.Position;
 import vut.fit.ija.proj1.data.exceptions.StreetsNotConnectedException;
-import vut.fit.ija.proj1.gui.elements.VehicleStop;
 import vut.fit.ija.proj1.gui.elements.Street;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -19,15 +16,16 @@ public class Path {
     private Coordinates stopCoordinates;
     private List<Coordinates> path;
     private List<Street> streets;
+    private int delay;
 
     /**
      * Constructs a new path
      */
-    public Path(Coordinates startCoordinates, Coordinates stopCoordinates, List<Street> streets) throws StreetsNotConnectedException {
+    public Path(Coordinates startCoordinates, Coordinates stopCoordinates, List<Street> streets, int delay) throws StreetsNotConnectedException {
         this.startCoordinates = startCoordinates;
         this.stopCoordinates = stopCoordinates;
         this.streets = streets;
-
+        this.delay = delay;
         path = constructPath();
     }
 
@@ -44,6 +42,10 @@ public class Path {
         }
         path.add(stopCoordinates);
         return path;
+    }
+
+    public int getDelay() {
+        return delay;
     }
 
     /**
@@ -76,6 +78,7 @@ public class Path {
         }
 
         double driven = (distance - length) / currentLength;
+        assert a != null;
         return new PositionInfo(
                 new Coordinates(a.getX() + (b.getX() - a.getX())*driven, a.getY() + (b.getY() - a.getY())*driven),
                 streets.get(i)
