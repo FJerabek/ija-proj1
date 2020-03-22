@@ -5,8 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
 import vut.fit.ija.proj1.data.PathBetweenStops;
 import vut.fit.ija.proj1.data.VehicleLine;
@@ -17,105 +16,24 @@ import vut.fit.ija.proj1.gui.elements.VehicleStop;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 public class LineModifyMode {
+    private static final Color SELECTED_PATH_COLOR = Color.valueOf("#1565c0");
     private final Shape[] selectedPath = {null};
-    private final Shape[] selectedStop = {null};
     private ListView<VehicleLine> lineListView;
     private ListView<VehicleStop> stopListView;
+    private List<VehicleStop> selectedStops = new ArrayList<>();
     private ListView<PathBetweenStops> pathListView;
     private List<VehicleLine> lines;
     private Pane content;
     private PathBetweenStops currentEdit;
     private VehicleLine currentEditLine;
     private VehicleStop targetStop;
-    private List<SelectedStreet> newPath;
+    private List<Street> newPath;
     private Button exitLineModifyButton;
-
-    private Street.OnStreetSelect onStreetSelectListener = street -> {
-        if(currentEdit == null) return;
-
-        SelectedStreet finderStreet = new SelectedStreet(null, street);
-        if(newPath.contains(finderStreet)) {
-            SelectedStreet selected = newPath.get(newPath.indexOf(finderStreet));
-            content.getChildren().remove(selected.line);
-            newPath.remove(selected);
-        } else {
-            if(street.isClosed()) {
-                showDialog(Alert.AlertType.WARNING,
-                        "Street is closed",
-                        "Street is closed",
-                        "Invalid path: Selected street is closed.");
-                return;
-            }
-            if(newPath.size() > 0) {
-                SelectedStreet selectedStreet = newPath.get(newPath.size() - 1);
-                if (selectedStreet.street.getCrossingCoordinates(street) == null) {
-                    showDialog(Alert.AlertType.WARNING,
-                            "Street does not connect",
-                            "Street does not connect",
-                            "Invalid path: Selected street does not connect.");
-                    return;
-                }
-            } else {
-                if(!street.getStops().contains(currentEdit.getStop1()) && !street.getStops().contains(currentEdit.getStop2())) {
-                    showDialog(Alert.AlertType.WARNING,
-                            "Invalid path origin",
-                            "Invalid path origin",
-                            "InvalidPath: Path must start from one of the connecting stops");
-                    return;
-                } else {
-                    targetStop = street.getStops().contains(currentEdit.getStop1()) ? currentEdit.getStop2() : currentEdit.getStop1();
-                }
-            }
-
-            Line line = new Line(street.getFrom().getX(), street.getFrom().getY(), street.getTo().getX(), street.getTo().getY());
-            line.setStroke(Color.valueOf("#1b5e20"));
-            line.setStrokeWidth(3);
-            content.getChildren().add(line);
-            newPath.add(new SelectedStreet(line, street));
-            if(street.getStops().contains(targetStop)) {
-                List<Street> path = new ArrayList<>();
-                for(SelectedStreet newPathStreet: newPath) {
-                    path.add(newPathStreet.street);
-                }
-                PathBetweenStops pathBetweenStops = null;
-                try {
-                    pathBetweenStops = new PathBetweenStops(
-                            currentEdit.getStop1().equals(targetStop)? currentEdit.getStop2() : currentEdit.getStop1(),
-                            targetStop,
-                            path,
-                            Duration.ofSeconds(getNewPathDelay())
-                    );
-                } catch (StreetsNotConnectedException e) {
-                    e.printStackTrace();
-                }
-
-                assert pathBetweenStops != null;
-
-                //Update line path between stops
-                currentEditLine.getStopsPath().remove(currentEdit);
-                currentEditLine.getStopsPath().add(pathBetweenStops);
-
-                showDialog(Alert.AlertType.INFORMATION,
-                        "Path set",
-                        "Path set",
-                        "Path successfully set");
-
-                //Remove new path highlight
-                for(SelectedStreet newPathStreet: newPath) {
-                    content.getChildren().remove(newPathStreet.line);
-                }
-                updateListsAfterNewPath();
-                //Clean after successful path set
-                exitLineModifyButton.setDisable(false);
-                currentEdit = null;
-                currentEditLine = null;
-            }
-        }
-    };
+    private boolean pathAdding = false;
+    private Runnable onStopsSelectionEnd;
 
     private int getNewPathDelay() {
         boolean failed = true;
@@ -245,11 +163,9 @@ public class LineModifyMode {
     }
 
     public void clean() {
-        if(selectedStop[0] != null)
-            content.getChildren().remove(selectedStop[0]);
-
-        if(selectedPath[0] != null)
-            content.getChildren().remove(selectedPath[0]);
+        for (VehicleStop stop: selectedStops) {
+            stop.setSelected(false);
+        }
     }
 
     public boolean canExit() {
@@ -289,12 +205,10 @@ public class LineModifyMode {
         });
 
         stopListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if(selectedStop[0] != null) {
-                content.getChildren().remove(selectedStop[0]);
-            }
-            if(newValue == null) return;
-            selectedStop[0] = new Circle(newValue.getCoordinates().getX(), newValue.getCoordinates().getY(), 5, Color.valueOf("#1565c0"));
-            content.getChildren().add(selectedStop[0]);
+            if(oldValue != null)
+                oldValue.setSelected(false);
+            if(newValue != null)
+                newValue.setSelected(true);
         });
 
         pathListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -303,7 +217,7 @@ public class LineModifyMode {
             }
             if(newValue == null) return;
             selectedPath[0] = newValue.getPathFromStop2().getShape();
-            selectedPath[0].setStroke(Color.valueOf("#1565c0"));
+            selectedPath[0].setStroke(SELECTED_PATH_COLOR);
             content.getChildren().add(selectedPath[0]);
         });
     }
@@ -318,8 +232,8 @@ public class LineModifyMode {
         if(selectedPath[0] != null)
             content.getChildren().remove(selectedPath[0]);
 
-        if(selectedStop[0] != null)
-            content.getChildren().remove(selectedStop[0]);
+        for(VehicleStop stop : selectedStops)
+            stop.setSelected(false);
     }
 
     private void editPath(PathBetweenStops path) {
@@ -327,11 +241,100 @@ public class LineModifyMode {
         currentEditLine = lineListView.getSelectionModel().getSelectedItem();
         newPath = new ArrayList<>();
         exitLineModifyButton.setDisable(true);
+        lineListView.setDisable(true);
+        pathListView.setDisable(true);
+        stopListView.setDisable(true);
         deselectAll();
     }
 
-    public Street.OnStreetSelect getOnStreetSelectListener() {
-        return onStreetSelectListener;
+    public OnSelect<Street> getOnStreetSelectListener() {
+        return new OnSelect<Street>() {
+            @Override
+            public boolean onSelect(Street street) {
+                if(currentEdit == null) return false;
+
+                if(street.isClosed()) {
+                    showDialog(Alert.AlertType.WARNING,
+                            "Street is closed",
+                            "Street is closed",
+                            "Invalid path: Selected street is closed.");
+                    return false;
+                }
+                if(newPath.size() > 0) {
+                    Street lastSelectedStreet = newPath.get(newPath.size() - 1);
+                    if (lastSelectedStreet.getCrossingCoordinates(street) == null) {
+                        showDialog(Alert.AlertType.WARNING,
+                                "Street does not connect",
+                                "Street does not connect",
+                                "Invalid path: Selected street does not connect.");
+                        return false;
+                    }
+                } else {
+                    if(!street.getStops().contains(currentEdit.getStop1()) && !street.getStops().contains(currentEdit.getStop2())) {
+                        showDialog(Alert.AlertType.WARNING,
+                                "Invalid path origin",
+                                "Invalid path origin",
+                                "InvalidPath: Path must start from one of the connecting stops");
+                        return false;
+                    } else {
+                        targetStop = street.getStops().contains(currentEdit.getStop1()) ? currentEdit.getStop2() : currentEdit.getStop1();
+                    }
+                }
+
+                newPath.add(street);
+                if(street.getStops().contains(targetStop)) {
+                    PathBetweenStops pathBetweenStops = null;
+                    try {
+                        pathBetweenStops = new PathBetweenStops(
+                                currentEdit.getStop1().equals(targetStop)? currentEdit.getStop2() : currentEdit.getStop1(),
+                                targetStop,
+                                newPath,
+                                Duration.ofSeconds(getNewPathDelay())
+                        );
+                    } catch (StreetsNotConnectedException e) {
+                        e.printStackTrace();
+                    }
+
+                    assert pathBetweenStops != null;
+
+                    //Update line path between stops
+                    currentEditLine.getStopsPath().remove(currentEdit);
+                    currentEditLine.getStopsPath().add(pathBetweenStops);
+
+                    showDialog(Alert.AlertType.INFORMATION,
+                            "Path set",
+                            "Path set",
+                            "Path successfully set");
+
+                    for (Street streetPath : newPath) {
+                        streetPath.setSelected(false);
+                    }
+
+                    updateListsAfterNewPath();
+                    //Clean after successful path set
+                    exitLineModifyButton.setDisable(false);
+                    currentEdit = null;
+                    currentEditLine = null;
+
+                    pathBetweenStops.getStop2().setSelected(false);
+                    pathBetweenStops.getStop1().setSelected(false);
+                    for(Street selectedStreet : pathBetweenStops.getStreetPath())
+                        selectedStreet.setSelected(false);
+                    newPath = new ArrayList<>();
+                    lineListView.setDisable(false);
+                    pathListView.setDisable(false);
+                    stopListView.setDisable(false);
+                    return false;
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onDeselect(Street street) {
+                newPath.remove(street);
+                return true;
+            }
+        };
     }
 
     private void deletePath(PathBetweenStops path) {
@@ -340,34 +343,52 @@ public class LineModifyMode {
         pathListView.getItems().remove(path);
     }
 
-    private static class SelectedStreet {
-        private Line line;
-        private Street street;
+    public void addPath(Runnable onStopsSelectionEnd) {
+        this.onStopsSelectionEnd = onStopsSelectionEnd;
+        showDialog(Alert.AlertType.INFORMATION,
+                "Select stops",
+                "Select stops",
+                "Select two stops for path creation between them");
+        deselectAll();
+        lineListView.setDisable(true);
+        pathListView.setDisable(true);
+        stopListView.setDisable(true);
+        pathAdding = true;
+    }
 
-        public SelectedStreet(Line line, Street street) {
-            this.line = line;
-            this.street = street;
-        }
+    public OnSelect<VehicleStop> getOnStopSelectedListener() {
+        return new OnSelect<VehicleStop>() {
+            @Override
+            public boolean onSelect(VehicleStop selected) {
+                if(!pathAdding) return false;
 
-        public Line getLine() {
-            return line;
-        }
+                selectedStops.add(selected);
+                if(selectedStops.size() == 2) {
+                    pathAdding = false;
+                    currentEditLine = lineListView.getSelectionModel().getSelectedItem();
+                    try {
+                        currentEdit = new PathBetweenStops(selectedStops.get(0), selectedStops.get(1), new ArrayList<>(), Duration.ZERO);
+                    } catch (StreetsNotConnectedException e) {
+                        //Cant happen. Does not have streets yet
+                        e.printStackTrace();
+                    }
+                    selectedStops.clear();
+                    onStopsSelectionEnd.run();
+                    showDialog(
+                            Alert.AlertType.INFORMATION,
+                            "Select path",
+                            "Select path",
+                            "Now select path between these stops"
+                    );
+                }
+                return true;
+            }
 
-        public Street getStreet() {
-            return street;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            SelectedStreet that = (SelectedStreet) o;
-            return Objects.equals(street, that.street);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(street);
-        }
+            @Override
+            public boolean onDeselect(VehicleStop deselected) {
+                selectedStops.remove(deselected);
+                return true;
+            }
+        };
     }
 }

@@ -10,7 +10,6 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
 import vut.fit.ija.proj1.data.*;
 import vut.fit.ija.proj1.gui.elements.VehicleStop;
@@ -57,10 +56,12 @@ public class MainController {
 
     private LocalTime localTime = LocalTime.now();
     private Timer timer;
-    private Shape selectedShape;
+    private Selectable selectedShape;
+    private Shape vehicleLineGuiShape;
     private List<Vehicle> vehicles;
     private List<Street> streets;
     private List<VehicleLine> lines;
+    private List<VehicleStop> stops;
 
     private ApplicationState state = ApplicationState.VIEW;
     private LineModifyMode lineModifyMode;
@@ -68,33 +69,35 @@ public class MainController {
     private ChangeListener<Number> trafficListener;
     private ChangeListener<Boolean> closedListener;
 
-    private Street.OnStreetSelect defaultOnStreetSelectListener = selectedStreet -> {
-        deselectItem();
-        streetConfig.setVisible(true);
+    private OnSelect<Street> defaultOnStreetSelectListener = new OnSelect<Street>() {
+        @Override
+        public boolean onSelect(Street selected) {
+            deselectItem();
+            streetConfig.setVisible(true);
 
-        traffic.setValue(selectedStreet.getTraffic());
-        streetClosed.setSelected(selectedStreet.isClosed());
+            traffic.setValue(selected.getTraffic());
+            streetClosed.setSelected(selected.isClosed());
 
-        trafficListener = (observable, oldValue, newValue) -> {
-            selectedStreet.setTraffic(newValue.doubleValue());
-        };
+            trafficListener = (observable, oldValue, newValue) -> {
+                selected.setTraffic(newValue.doubleValue());
+            };
 
-        traffic.valueProperty().addListener(trafficListener);
+            traffic.valueProperty().addListener(trafficListener);
 
-        closedListener = (observable, oldValue, newValue) -> {
-            selectedStreet.setClosed(newValue);
-        };
+            closedListener = (observable, oldValue, newValue) -> {
+                selected.setClosed(newValue);
+            };
 
-        streetClosed.selectedProperty().addListener(closedListener);
+            streetClosed.selectedProperty().addListener(closedListener);
 
-        Line line = new Line(selectedStreet.getFrom().getX(), selectedStreet.getFrom().getY(),
-                selectedStreet.getTo().getX(), selectedStreet.getTo().getY());
+            selectedShape = selected;
+            return true;
+        }
 
-        line.setStroke(Color.valueOf("#d32f2f"));
-        line.setStrokeWidth(3);
-
-        selectedShape = line;
-        content.getChildren().add(line);
+        @Override
+        public boolean onDeselect(Street deselected) {
+            return true;
+        }
     };
 
     @FXML
@@ -114,6 +117,12 @@ public class MainController {
     @FXML
     private void onClicked(MouseEvent e) {
         deselectItem();
+    }
+
+    @FXML
+    private void onAddPath() {
+        setStopsSelectable(true);
+        lineModifyMode.addPath(() -> setStopsSelectable(false));
     }
 
     @FXML
@@ -155,16 +164,27 @@ public class MainController {
     }
 
     public void drawStops(List<VehicleStop> stops) {
+        this.stops = stops;
         for(VehicleStop stop : stops) {
             content.getChildren().addAll(stop.draw());
         }
     }
 
+    public void setStopsOnSelectedListener(OnSelect<VehicleStop> listener) {
+        for(VehicleStop stop : stops) {
+            stop.setOnSelect(listener);
+        }
+    }
+
+    private void setStopsSelectable(boolean selectable) {
+        for(VehicleStop stop : stops) {
+            stop.setSelectable(selectable);
+        }
+    }
 
     private void deselectItem() {
-        if (selectedShape != null) {
-            content.getChildren().remove(selectedShape);
-        }
+        if(selectedShape != null)
+            selectedShape.setSelected(false);
 
         if(trafficListener != null)
             traffic.valueProperty().removeListener(trafficListener);
@@ -172,15 +192,18 @@ public class MainController {
         if(closedListener != null)
             streetClosed.selectedProperty().removeListener(closedListener);
 
+        if(vehicleLineGuiShape != null)
+            content.getChildren().remove(vehicleLineGuiShape);
+
         listView.setItems(null);
         listView.setVisible(false);
         streetConfig.setVisible(false);
     }
 
-    private void setVehicleOnSelectCallback(Vehicle.OnVehicleSelectListener callback) {
+    private void setVehicleOnSelectCallback(OnSelect<Vehicle> callback) {
         for (Vehicle vehicle :
                 vehicles) {
-            vehicle.setOnSelectListener(callback);
+            vehicle.setOnSelect(callback);
         }
     }
 
@@ -212,9 +235,9 @@ public class MainController {
         }
     }
 
-    private void setStreetOnClickCallback(Street.OnStreetSelect callback) {
+    private void setStreetOnClickCallback(OnSelect<Street> callback) {
         for (Street street : streets) {
-            street.setOnSelectListener(callback);
+            street.setOnSelect(callback);
         }
     }
 
@@ -223,6 +246,7 @@ public class MainController {
         switch(newMode) {
             case VIEW:
                 setStreetOnClickCallback(defaultOnStreetSelectListener);
+                setStopsOnSelectedListener(null);
                 timeScale.setDisable(true);
                 setTimeScaleButton.setDisable(false);
                 lineModifySidePanelContainer.setVisible(false);
@@ -237,6 +261,7 @@ public class MainController {
                 break;
 
             case LINE_MODIFY:
+                setStopsOnSelectedListener(lineModifyMode.getOnStopSelectedListener());
                 setStreetOnClickCallback(lineModifyMode.getOnStreetSelectListener());
                 lineListView.refresh();
                 lineModifySidePanelContainer.setVisible(true);
@@ -255,14 +280,24 @@ public class MainController {
     }
 
     public void setCallbacks() {
-        setVehicleOnSelectCallback(vehicle -> {
-            deselectItem();
-            listView.setVisible(true);
+        setVehicleOnSelectCallback(new OnSelect<Vehicle>() {
+            @Override
+            public boolean onSelect(Vehicle selected) {
+                deselectItem();
+                selectedShape = selected;
+                listView.setVisible(true);
 
-            listView.setItems(FXCollections.observableArrayList(vehicle.getTimetable().getEntries()));
-            Shape shape = vehicle.getLine().getGui();
-            selectedShape = shape;
-            content.getChildren().add(shape);
+                listView.setItems(FXCollections.observableArrayList(selected.getTimetable().getEntries()));
+                Shape shape = selected.getLine().getGui();
+                vehicleLineGuiShape = shape;
+                content.getChildren().add(shape);
+                return true;
+            }
+
+            @Override
+            public boolean onDeselect(Vehicle deselected) {
+                return true;
+            }
         });
 
         setStreetOnClickCallback(defaultOnStreetSelectListener);

@@ -12,6 +12,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="775.0" prefWidth="1099.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vut.fit.ija.proj1.gui.MainController">
@@ -29,7 +30,7 @@
          <AnchorPane prefHeight="775.0" prefWidth="217.0" BorderPane.alignment="CENTER">
             <children>
                <Label layoutX="25.0" layoutY="6.0" prefHeight="17.0" prefWidth="38.0" text="Time:" AnchorPane.rightAnchor="70.0" AnchorPane.topAnchor="10.0" />
-               <Label fx:id="time" layoutX="103.0" layoutY="10.0" text="50" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+               <Label fx:id="time" layoutX="103.0" layoutY="10.0" text="0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
                <AnchorPane fx:id="lineModifySidePanelContainer" prefHeight="200.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="120.0">
                   <children>
                      <Label alignment="CENTER" text="Line modify  config" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="10.0">
@@ -37,25 +38,34 @@
                            <Font name="Arial Bold" size="18.0" />
                         </font>
                      </Label>
-                     <ListView fx:id="lineListView" layoutX="9.0" layoutY="57.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="450.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0" />
-                     <Label alignment="CENTER" layoutX="15.0" layoutY="36.0" text="Lines" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="40.0">
-                        <font>
-                           <Font name="System Bold" size="14.0" />
-                        </font>
-                     </Label>
-                     <ListView fx:id="stopListView" layoutX="15.0" layoutY="354.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="250.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="230.0" />
-                     <Label alignment="CENTER" layoutX="95.0" layoutY="383.0" text="Stops" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="210.0">
-                        <font>
-                           <Font name="Arial Bold" size="14.0" />
-                        </font>
-                     </Label>
-                     <Label alignment="CENTER" layoutX="95.0" layoutY="414.0" text="Paths" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="410.0">
-                        <font>
-                           <Font name="Arial Bold" size="14.0" />
-                        </font>
-                     </Label>
-                     <ListView fx:id="pathListView" layoutX="9.0" layoutY="448.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="430.0" />
-                     <Button fx:id="exitLineEditModeButton" layoutX="41.0" layoutY="625.0" mnemonicParsing="false" onAction="#onExitLineEdit" text="Exit line edit mode" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="630.0" />
+                     <VBox alignment="TOP_CENTER" layoutX="23.0" layoutY="66.0" prefHeight="474.0" prefWidth="148.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0">
+                        <children>
+                           <Label alignment="CENTER" text="Lines">
+                              <font>
+                                 <Font name="System Bold" size="14.0" />
+                              </font>
+                           </Label>
+                           <ListView fx:id="lineListView" prefHeight="145.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                           <Label alignment="CENTER" text="Stops">
+                              <font>
+                                 <Font name="Arial Bold" size="14.0" />
+                              </font>
+                           </Label>
+                           <ListView fx:id="stopListView" prefHeight="175.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                           <AnchorPane>
+                              <children>
+                                 <Label alignment="CENTER" text="Paths" textAlignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <font>
+                                       <Font name="Arial Bold" size="14.0" />
+                                    </font>
+                                 </Label>
+                                 <Button layoutX="157.0" layoutY="77.0" mnemonicParsing="false" onAction="#onAddPath" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                              </children>
+                           </AnchorPane>
+                           <ListView fx:id="pathListView" prefHeight="195.0" prefWidth="200.0" />
+                        </children>
+                     </VBox>
+                     <Button fx:id="exitLineEditModeButton" layoutX="41.0" layoutY="625.0" mnemonicParsing="false" onAction="#onExitLineEdit" prefHeight="30.0" prefWidth="217.0" text="Exit line edit mode" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
                   </children>
                </AnchorPane>
                <AnchorPane fx:id="streetConfig" layoutX="6.0" layoutY="148.0" prefHeight="200.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="120.0">

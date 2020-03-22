@@ -2,14 +2,19 @@ package vut.fit.ija.proj1.gui.elements;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.util.StdConverter;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import vut.fit.ija.proj1.data.Coordinates;
+import vut.fit.ija.proj1.gui.Drawable;
+import vut.fit.ija.proj1.gui.OnSelect;
+import vut.fit.ija.proj1.gui.Selectable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,19 +23,30 @@ import java.util.Objects;
 /**
  * Class representing single street on map
  */
+@JsonIgnoreProperties(value = {
+        "gui",
+        "closedListener",
+        "onSelectListener",
+        "selectableGui",
+        "selected",
+        "selectable"
+})
 @JsonDeserialize(converter=Street.StreetSanitizer.class)
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "name")
-public class Street implements Drawable {
+public class Street implements Drawable, Selectable<Street> {
+    private final Color SELECTED_COLOR = Color.valueOf("#d32f2f");
     private String name;
     private List<VehicleStop> stops;
     private Coordinates from;
     private Coordinates to;
     private boolean closed = false;
     private double traffic = 0;
-    @JsonIgnore
     private List<Shape> gui;
-    @JsonIgnore
     private OnStreetClosed closedListener;
+    private OnSelect<Street> onSelectListener;
+    private Line selectableGui;
+    private boolean selected;
+    private boolean selectable = true;
 
     public Street() {
     }
@@ -62,17 +78,6 @@ public class Street implements Drawable {
                 y,
                 new Line(from.getX(), from.getY(), to.getX(), to.getY())
         );
-    }
-
-    @JsonIgnore
-    @Override
-    public Coordinates getCoordinates() {
-        return new Coordinates((from.getX() + to.getX()) / 2, (from.getY() + to.getY()) / 2);
-    }
-
-    @Override
-    public List<Shape> draw() {
-        return gui;
     }
 
     public double getTraffic() {
@@ -107,15 +112,6 @@ public class Street implements Drawable {
 
     public void setClosedListener(OnStreetClosed closedListener) {
         this.closedListener = closedListener;
-    }
-
-    public void setOnSelectListener(OnStreetSelect listener) {
-        for (Shape shape: draw()) {
-            shape.setOnMouseClicked(event -> {
-                listener.onSelect(this);
-                event.consume();
-            });
-        }
     }
 
     /**
@@ -160,6 +156,100 @@ public class Street implements Drawable {
         }
     }
 
+    private void deselectGui() {
+        selectableGui.setStroke(Color.BLACK);
+        selectableGui.setStrokeWidth(1);
+    }
+
+    private void selectGui() {
+        selectableGui.setStroke(SELECTED_COLOR);
+        selectableGui.setStrokeWidth(3);
+    }
+
+    private void jacksonPostConstruct() {
+        selectableGui = new Line(from.getX(), from.getY(), to.getX(), to.getY());
+        gui = Arrays.asList(
+                new Text(getCoordinates().getX(), getCoordinates().getY(), name),
+                selectableGui
+        );
+
+        for (Shape shape : gui) {
+            shape.setOnMouseClicked(mouseEvent -> {
+                mouseEvent.consume();
+                if(!selectable) return;
+                if(selected) {
+                    if(onSelectListener != null) {
+                        if (onSelectListener.onDeselect(this)) {
+                            selected = false;
+                            deselectGui();
+                        }
+                    } else {
+                        selected = false;
+                        deselectGui();
+                    }
+                } else {
+                    if(onSelectListener != null) {
+                        selectGui();
+                        if(onSelectListener.onSelect(this)) {
+                            selected = true;
+                        } else {
+                            deselectGui();
+                        }
+                    } else {
+                        selected = true;
+                        selectGui();
+                    }
+                }
+            });
+        }
+    }
+
+    @JsonIgnore
+    @Override
+    public Coordinates getCoordinates() {
+        return new Coordinates((from.getX() + to.getX()) / 2, (from.getY() + to.getY()) / 2);
+    }
+
+    @Override
+    public List<Shape> draw() {
+        return gui;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
+    @Override
+    public void setOnSelect(OnSelect<Street> selectListener) {
+        onSelectListener = selectListener;
+    }
+
+    @Override
+    public Shape getSelectableGui() {
+        return selectableGui;
+    }
+
+    @Override
+    public void setSelectable(boolean selectable) {
+        this.selectable = selectable;
+    }
+
+    @Override
+    public boolean isSelectable() {
+        return selectable;
+    }
+
+    @Override
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+        if(selected) {
+            selectGui();
+        } else {
+            deselectGui();
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -173,29 +263,12 @@ public class Street implements Drawable {
         return Objects.hash(name);
     }
 
-    @Override
-    public String toString() {
-        return name;
-    }
-
-    private void jacksonPostConstruct() {
-
-        gui = Arrays.asList(
-                new Text(getCoordinates().getX(), getCoordinates().getY(), name),
-                new Line(from.getX(), from.getY(), to.getX(), to.getY())
-        );
-    }
-
-
-    public interface OnStreetSelect{
-        void onSelect(Street street);
-    }
-
     public interface OnStreetClosed {
+
         void onClosed(Street street);
     }
-
     static class StreetSanitizer extends StdConverter<Street, Street> {
+
 
         @Override
         public Street convert(Street value) {

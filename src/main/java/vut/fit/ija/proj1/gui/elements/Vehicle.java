@@ -1,9 +1,6 @@
 package vut.fit.ija.proj1.gui.elements;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.util.StdConverter;
 import javafx.scene.control.Tooltip;
@@ -13,6 +10,9 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import vut.fit.ija.proj1.data.*;
+import vut.fit.ija.proj1.gui.Drawable;
+import vut.fit.ija.proj1.gui.OnSelect;
+import vut.fit.ija.proj1.gui.Selectable;
 
 import java.time.Duration;
 import java.time.LocalTime;
@@ -23,31 +23,42 @@ import java.util.Objects;
 /**
  * Class representing vehicle on the map
  */
+
+
+@JsonIgnoreProperties(value = {
+        "position",
+        "currentStop",
+        "path",
+        "gui",
+        "tooltip",
+        "delay",
+        "drivenDistance",
+        "inStop",
+        "onSelectListener",
+        "selectable",
+        "selected",
+        "selectableGui"
+})
 @JsonDeserialize(converter=Vehicle.VehicleSanitizer.class)
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
-public class Vehicle implements Drawable {
-    @JsonIgnore
+public class Vehicle implements Drawable, Selectable<Vehicle> {
     private Coordinates position;
-    @JsonIgnore
     private TimetableEntry currentStop;
     private VehicleLine line;
     private Timetable timetable;
     @JsonProperty("speed")
     private double speed = 0.5;
-    @JsonIgnore
     private TimetableEntry nextEntry;
-    @JsonIgnore
     private Path path;
-    @JsonIgnore
     private List<Shape> gui;
-    @JsonIgnore
     private Tooltip tooltip;
-    @JsonIgnore
     private Duration delay = Duration.ofSeconds(0);
-    @JsonIgnore
     private double drivenDistance = 0;
-    @JsonIgnore
     private boolean inStop = false;
+    private OnSelect<Vehicle> onSelectListener;
+    private boolean selectable = true;
+    private boolean selected;
+    private Circle selectableGui;
 
     public Vehicle() {
     }
@@ -78,8 +89,48 @@ public class Vehicle implements Drawable {
         Tooltip.install(text, tooltip);
         text.setFont(Font.font(text.getFont().getFamily(), FontWeight.BOLD, 15));
         gui = new ArrayList<>();
+        selectableGui = circle;
         gui.add(circle);
         gui.add(text);
+        setOnClickListeners();
+    }
+
+    private void deselectGui() {
+        selectableGui.setRadius(7);
+    }
+
+    private void selectGui() {
+        selectableGui.setRadius(10);
+    }
+
+    private void setOnClickListeners() {
+        for(Shape shape : gui) {
+            shape.setOnMouseClicked(mouseEvent -> {
+                mouseEvent.consume();
+                if(!selectable) return;
+                if(selected) {
+                    if(onSelectListener != null) {
+                        if(onSelectListener.onDeselect(this)) {
+                            selected = false;
+                            deselectGui();
+                        }
+                    } else {
+                        selected = false;
+                        deselectGui();
+                    }
+                } else {
+                    if(onSelectListener != null) {
+                        if(onSelectListener.onSelect(this)) {
+                            selected = true;
+                            selectGui();
+                        }
+                    } else {
+                        selected = true;
+                        selectGui();
+                    }
+                }
+            });
+        }
     }
 
     public TimetableEntry getCurrentStop() {
@@ -204,20 +255,6 @@ public class Vehicle implements Drawable {
         position = coords;
     }
 
-    /**
-     * Sets listener on vehicle click
-     * @param listener Vehicle click listener
-     */
-    public void setOnSelectListener(OnVehicleSelectListener listener) {
-        for (Shape shape :
-                gui) {
-            shape.onMouseClickedProperty().setValue(event -> {
-                listener.vehicleSelect(this);
-                event.consume();
-            });
-        }
-    }
-
     @Override
     @JsonIgnore
     public Coordinates getCoordinates() {
@@ -229,15 +266,34 @@ public class Vehicle implements Drawable {
         return gui;
     }
 
-    /**
-     * Interface for handling vehicle clicks
-     */
-    public interface OnVehicleSelectListener {
-        /**
-         * Is fired when vehicle is selected
-         * @param vehicle selected vehicle
-         */
-        void vehicleSelect(Vehicle vehicle);
+    @Override
+    public void setOnSelect(OnSelect<Vehicle> selectListener) {
+        this.onSelectListener = selectListener;
+    }
+
+    @Override
+    public Shape getSelectableGui() {
+        return selectableGui;
+    }
+
+    @Override
+    public void setSelectable(boolean selectable) {
+        this.selectable = selectable;
+    }
+
+    @Override
+    public boolean isSelectable() {
+        return selectable;
+    }
+
+    @Override
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+        if(selected) {
+            selectGui();
+        } else {
+            deselectGui();
+        }
     }
 
     public static class VehicleSanitizer extends StdConverter<Vehicle,Vehicle> {
