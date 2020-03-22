@@ -1,6 +1,9 @@
 package vut.fit.ija.proj1.data;
 
-import vut.fit.ija.proj1.gui.elements.Stop;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import vut.fit.ija.proj1.gui.elements.VehicleStop;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -8,9 +11,13 @@ import java.util.List;
 /**
  * Class representing timetable
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.None.class)
 public class Timetable {
     private List<TimetableEntry> entries;
     private int i = 0;
+
+    public Timetable() {
+    }
 
     /**
      * Timetable constructor
@@ -34,17 +41,41 @@ public class Timetable {
      * @param currentTime current time
      * @return next timetable entry
      */
-    public TimetableEntry getNextEntry(LocalTime currentTime) {
+    @JsonIgnore
+    public TimetableEntry getNextEntry(LocalTime currentTime, List<VehicleStop> stops) {
         TimetableEntry next = null;
         for (TimetableEntry entry : entries) {
-            if(next == null && entry.getTime().isAfter(currentTime)) {
+            if(next == null && entry.getTime().isAfter(currentTime) && stops.contains(entry.getStop())) {
                 next = entry;
-            } else if (next != null && entry.getTime().isAfter(currentTime) && entry.getTime().isBefore(next.getTime())) {
+            } else if (next != null &&
+                    entry.getTime().isAfter(currentTime) &&
+                    entry.getTime().isBefore(next.getTime()) &&
+                    stops.contains(entry.getStop())) {
                 next = entry;
+            }
+        }
+        return next;
+    }
+
+    @JsonIgnore
+    public TimetableEntry getPreviousEntry(LocalTime currentTime, List<VehicleStop> stops) {
+        TimetableEntry previous = null;
+        for (TimetableEntry entry : entries) {
+            if(previous == null &&
+                    entry.getTime().isBefore(currentTime) &&
+                    stops.contains(entry.getStop())
+            ) {
+                previous = entry;
+            } else if (previous != null &&
+                    entry.getTime().isBefore(currentTime) &&
+                    entry.getTime().isAfter(previous.getTime()) &&
+                    stops.contains(entry.getStop())
+            ) {
+                previous = entry;
             }
 
         }
-        return next;
+        return previous;
     }
 
     /**

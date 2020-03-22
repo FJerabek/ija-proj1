@@ -1,24 +1,23 @@
 package vut.fit.ija.proj1;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
-import vut.fit.ija.proj1.data.Coordinates;
-import vut.fit.ija.proj1.data.Path;
-import vut.fit.ija.proj1.data.TimetableEntry;
+import vut.fit.ija.proj1.data.file.ColorDeserializer;
+import vut.fit.ija.proj1.data.file.Data;
 import vut.fit.ija.proj1.gui.MainController;
-import vut.fit.ija.proj1.gui.elements.Stop;
-import vut.fit.ija.proj1.gui.elements.Street;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Represents main application
@@ -44,9 +43,37 @@ public class MainApplication extends Application {
             Platform.exit();
             System.exit(0);
         });
-//        Load map and timetables
+
+
+
+        try {
+            Data loaded = loadMapLayout(new java.io.File("test.yml"));
+            MainController controller = loader.getController();
+
+            controller.setLines(loaded.getLines());
+            controller.drawStreets(loaded.getStreets());
+            controller.drawStops(loaded.getStops());
+            controller.setVehicles(loaded.getVehicles());
+            controller.setCallbacks();
+            controller.startTime(1);
+
+            controller.setupLineModify();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-    
+
+    private static Data loadMapLayout(java.io.File file) throws IOException {
+        YAMLFactory factory = new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER);
+        ObjectMapper mapper = new ObjectMapper(factory);
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        mapper.registerModule(new JavaTimeModule());
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(Color.class, new ColorDeserializer());
+        mapper.registerModule(module);
+        return mapper.readValue(file, Data.class);
+    }
+
     public static void main(String[] args) {
         launch(args);
     }

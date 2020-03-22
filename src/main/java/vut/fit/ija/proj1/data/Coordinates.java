@@ -9,6 +9,9 @@ public class Coordinates {
     private double x;
     private double y;
 
+    public Coordinates() {
+    }
+
     /**
      * Creates a new coordinates on specified possition
      * @param x X coordinate

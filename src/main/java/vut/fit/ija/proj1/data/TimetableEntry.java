@@ -1,6 +1,8 @@
 package vut.fit.ija.proj1.data;
 
-import vut.fit.ija.proj1.gui.elements.Stop;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import vut.fit.ija.proj1.gui.elements.VehicleStop;
 
 import java.time.LocalTime;
 import java.util.Objects;
@@ -8,16 +10,20 @@ import java.util.Objects;
 /**
  * Class representing single timetable entry
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.None.class)
 public class TimetableEntry {
-    private Stop stop;
+    private VehicleStop stop;
     private LocalTime time;
+
+    public TimetableEntry() {
+    }
 
     /**
      * Timietable entry constructor
      * @param stop stop
      * @param time time
      */
-    public TimetableEntry(Stop stop, LocalTime time) {
+    public TimetableEntry(VehicleStop stop, LocalTime time) {
         this.stop = stop;
         this.time = time;
     }
@@ -26,7 +32,7 @@ public class TimetableEntry {
      * Returns timetable entry stop
      * @return timetable entry stop
      */
-    public Stop getStop() {
+    public VehicleStop getStop() {
         return stop;
     }
 
@@ -54,9 +60,6 @@ public class TimetableEntry {
 
     @Override
     public String toString() {
-        return "TimetableEntry{" +
-                "stop=" + stop +
-                ", time=" + time +
-                '}';
+        return stop + "\t" + time;
     }
 }

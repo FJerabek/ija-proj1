@@ -1,4 +1,4 @@
-package vut.fit.ija.proj1.gui.elements;
+package vut.fit.ija.proj1.gui;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.shape.Shape;
