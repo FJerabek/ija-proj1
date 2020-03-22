@@ -1,3 +1,7 @@
+/**
+ * @author xjerab25
+ * File representing main controller for application gui
+ */
 package vut.fit.ija.proj1.gui;
 
 import javafx.application.Platform;
@@ -22,6 +26,9 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * Main controller for application gui
+ */
 public class MainController {
     @FXML
     private ListView<VehicleLine> lineListView;
@@ -78,15 +85,11 @@ public class MainController {
             traffic.setValue(selected.getTraffic());
             streetClosed.setSelected(selected.isClosed());
 
-            trafficListener = (observable, oldValue, newValue) -> {
-                selected.setTraffic(newValue.doubleValue());
-            };
+            trafficListener = (observable, oldValue, newValue) -> selected.setTraffic(newValue.doubleValue());
 
             traffic.valueProperty().addListener(trafficListener);
 
-            closedListener = (observable, oldValue, newValue) -> {
-                selected.setClosed(newValue);
-            };
+            closedListener = (observable, oldValue, newValue) -> selected.setClosed(newValue);
 
             streetClosed.selectedProperty().addListener(closedListener);
 
@@ -100,31 +103,43 @@ public class MainController {
         }
     };
 
+    /**
+     * Gets called when mouse wheel is scrolled on map
+     * @param e scroll event
+     */
     @FXML
     private void onStackPaneScroll(ScrollEvent e) {
-        if (e.isControlDown()) {
-            e.consume();
+        e.consume();
 
-            double zoom = e.getDeltaY() > 0 ? 1.1 : 1 / 1.1;
+        double zoom = e.getDeltaY() > 0 ? 1.1 : 1 / 1.1;
 
-            content.setScaleX(zoom * content.getScaleX());
-            content.setScaleY(zoom * content.getScaleY());
+        content.setScaleX(zoom * content.getScaleX());
+        content.setScaleY(zoom * content.getScaleY());
 
-            scroll.layout();
-        }
+        scroll.layout();
     }
 
+    /**
+     * Gets called when mouse is clicked on empty space on map
+     * @param e mouse event
+     */
     @FXML
     private void onClicked(MouseEvent e) {
         deselectItem();
     }
 
+    /**
+     * Gets called when path add button is clicked on line modify side-panel
+     */
     @FXML
     private void onAddPath() {
         setStopsSelectable(true);
         lineModifyMode.addPath(() -> setStopsSelectable(false));
     }
 
+    /**
+     * Gets called when button for time scale changing is pressed
+     */
     @FXML
     private void onTimeScaleSet() {
         float scale = Float.parseFloat(timeScale.getText());
@@ -137,6 +152,9 @@ public class MainController {
         startTime(scale);
     }
 
+    /**
+     * Gets called when button for exiting line modify mode is clicked
+     */
     @FXML
     public void onExitLineEdit() {
         if(lineModifyMode.canExit()) {
@@ -145,10 +163,18 @@ public class MainController {
         }
     }
 
+    /**
+     * Set lines into controller
+     * @param lines vehicle lines
+     */
     public void setLines(List<VehicleLine> lines) {
         this.lines = lines;
     }
 
+    /**
+     * Set vehicles
+     * @param vehicles vehicles
+     */
     public void setVehicles(List<Vehicle> vehicles) {
         this.vehicles = vehicles;
         for(Vehicle vehicle : vehicles) {
@@ -156,6 +182,10 @@ public class MainController {
         }
     }
 
+    /**
+     * Draws streets on map
+     * @param streets streets to draw
+     */
     public void drawStreets(List<Street> streets) {
         this.streets = streets;
         for(Street street : streets) {
@@ -163,6 +193,10 @@ public class MainController {
         }
     }
 
+    /**
+     * Draws stops on map
+     * @param stops stops to draw
+     */
     public void drawStops(List<VehicleStop> stops) {
         this.stops = stops;
         for(VehicleStop stop : stops) {
@@ -170,18 +204,29 @@ public class MainController {
         }
     }
 
+    /**
+     * Sets on stop selected listeners for all stops
+     * @param listener on stop selected listener
+     */
     public void setStopsOnSelectedListener(OnSelect<VehicleStop> listener) {
         for(VehicleStop stop : stops) {
             stop.setOnSelect(listener);
         }
     }
 
+    /**
+     * Sets selectable property for all stops
+     * @param selectable new selectable property value
+     */
     private void setStopsSelectable(boolean selectable) {
         for(VehicleStop stop : stops) {
             stop.setSelectable(selectable);
         }
     }
 
+    /**
+     * Deselect all map gui elements
+     */
     private void deselectItem() {
         if(selectedShape != null)
             selectedShape.setSelected(false);
@@ -200,6 +245,10 @@ public class MainController {
         streetConfig.setVisible(false);
     }
 
+    /**
+     * Sets new on vehicle select listeners for all vehicles
+     * @param callback on vehicle select listener
+     */
     private void setVehicleOnSelectCallback(OnSelect<Vehicle> callback) {
         for (Vehicle vehicle :
                 vehicles) {
@@ -207,6 +256,9 @@ public class MainController {
         }
     }
 
+    /**
+     * Sets default on street closed listeners for all streets
+     */
     private void setStreetClosedCallback() {
         for (Street street : streets) {
             street.setClosedListener(closedStreet -> {
@@ -235,17 +287,25 @@ public class MainController {
         }
     }
 
-    private void setStreetOnClickCallback(OnSelect<Street> callback) {
+    /**
+     * Sets on street select listeners for all streets
+     * @param callback on street select listener
+     */
+    private void setStreetOnSelectCallback(OnSelect<Street> callback) {
         for (Street street : streets) {
             street.setOnSelect(callback);
         }
     }
 
+    /**
+     * Changes application mode and gui to specified mode.
+     * @param newMode application mode
+     */
     private void changeApplicationMode(ApplicationState newMode) {
         state = newMode;
         switch(newMode) {
             case VIEW:
-                setStreetOnClickCallback(defaultOnStreetSelectListener);
+                setStreetOnSelectCallback(defaultOnStreetSelectListener);
                 setStopsOnSelectedListener(null);
                 timeScale.setDisable(true);
                 setTimeScaleButton.setDisable(false);
@@ -262,7 +322,7 @@ public class MainController {
 
             case LINE_MODIFY:
                 setStopsOnSelectedListener(lineModifyMode.getOnStopSelectedListener());
-                setStreetOnClickCallback(lineModifyMode.getOnStreetSelectListener());
+                setStreetOnSelectCallback(lineModifyMode.getOnStreetSelectListener());
                 lineListView.refresh();
                 lineModifySidePanelContainer.setVisible(true);
                 listView.setVisible(false);
@@ -279,6 +339,9 @@ public class MainController {
         }
     }
 
+    /**
+     * Sets default callbacks for all gui elements
+     */
     public void setCallbacks() {
         setVehicleOnSelectCallback(new OnSelect<Vehicle>() {
             @Override
@@ -300,10 +363,14 @@ public class MainController {
             }
         });
 
-        setStreetOnClickCallback(defaultOnStreetSelectListener);
+        setStreetOnSelectCallback(defaultOnStreetSelectListener);
         setStreetClosedCallback();
     }
 
+    /**
+     * Start time with set scale
+     * @param scale time scale
+     */
     public void startTime(float scale) {
         timer = new Timer(false);
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -322,6 +389,9 @@ public class MainController {
         }, 0, (long) (1000 / scale));
     }
 
+    /**
+     * Sets up line modify mode
+     */
     public void setupLineModify() {
         lineModifyMode = new LineModifyMode(content, lineListView, stopListView, pathListView, lines, exitLineEditModeButton);
 

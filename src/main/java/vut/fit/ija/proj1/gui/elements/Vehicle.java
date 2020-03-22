@@ -1,3 +1,7 @@
+/**
+ * @author xjerab25
+ * File containing definition of {@link vut.fit.ija.proj1.gui.elements.Vehicle} class representing vehicle on map
+ */
 package vut.fit.ija.proj1.gui.elements;
 
 import com.fasterxml.jackson.annotation.*;
@@ -23,8 +27,6 @@ import java.util.Objects;
 /**
  * Class representing vehicle on the map
  */
-
-
 @JsonIgnoreProperties(value = {
         "position",
         "currentStop",
@@ -60,7 +62,10 @@ public class Vehicle implements Drawable, Selectable<Vehicle> {
     private boolean selected;
     private Circle selectableGui;
 
-    public Vehicle() {
+    /**
+     * Default constructor for jackson deserialization
+     */
+    private Vehicle() {
     }
 
     /**
@@ -76,12 +81,18 @@ public class Vehicle implements Drawable, Selectable<Vehicle> {
         createGui();
     }
 
+    /**
+     * Gets called after jackson deserialization completes
+     */
     private void postConstruct() {
         this.position = timetable.getEntries().get(0).getStop().getCoordinates();
         createGui();
     }
 
-    public void createGui() {
+    /**
+     * Creates and sets gui
+     */
+    private void createGui() {
         tooltip = new Tooltip(String.format("Delay: %s\nNext stop: %s", delay, nextEntry != null? nextEntry.getStop(): ""));
         Circle circle = new Circle(position.getX(), position.getY(), 7, line.getColor());
         Text text = new Text(position.getX() + 7, position.getY() + 4, line.getName());
@@ -95,14 +106,23 @@ public class Vehicle implements Drawable, Selectable<Vehicle> {
         setOnClickListeners();
     }
 
+    /**
+     * Sets gui parameters for deselected state
+     */
     private void deselectGui() {
         selectableGui.setRadius(7);
     }
 
+    /**
+     * Sets gui parameters for selected state
+     */
     private void selectGui() {
         selectableGui.setRadius(10);
     }
 
+    /**
+     * Sets on click listeners for gui shapes
+     */
     private void setOnClickListeners() {
         for(Shape shape : gui) {
             shape.setOnMouseClicked(mouseEvent -> {
@@ -133,10 +153,18 @@ public class Vehicle implements Drawable, Selectable<Vehicle> {
         }
     }
 
+    /**
+     * Return current stop that vehicle is on or is on path from
+     * @return current stop that vehicle is on or is on path from
+     */
     public TimetableEntry getCurrentStop() {
         return currentStop;
     }
 
+    /**
+     * Returns vehicle timetable
+     * @return vehicle timetable
+     */
     public Timetable getTimetable() {
         return timetable;
     }
@@ -161,20 +189,39 @@ public class Vehicle implements Drawable, Selectable<Vehicle> {
         }
     }
 
+    /**
+     * Returns distance by specifying start, current and finish time
+     * @param timeFrom start time
+     * @param time current time
+     * @param timeTo stop time
+     * @param pathLength path length
+     * @return driven distance according to time
+     */
     private double getDrivenDistanceByTime(LocalTime timeFrom, LocalTime time, LocalTime timeTo, double pathLength) {
         double drivenPart =  (time.toNanoOfDay() - timeFrom.toNanoOfDay()) / (double)Math.abs(timeTo.toNanoOfDay() - timeFrom.toNanoOfDay());
         return pathLength * drivenPart;
     }
 
 
+    /**
+     * Updates vehicle tooltip with current properties
+     */
     private void updateTooltip() {
         tooltip.setText(String.format("Delay: %s\nNext stop: %s", delay, nextEntry != null? nextEntry.getStop(): ""));
     }
 
+    /**
+     * Returns vehicle speed
+     * @return vehicle speed
+     */
     public double getSpeed() {
         return speed;
     }
 
+    /**
+     * Sets vehicle speed
+     * @param speed vehicle speed
+     */
     public void setSpeed(double speed) {
         this.speed = speed;
     }
@@ -203,7 +250,6 @@ public class Vehicle implements Drawable, Selectable<Vehicle> {
                         && inStop) {
             delay = Duration.ofSeconds(time.toSecondOfDay() - nextEntry.getTime().toSecondOfDay());
             currentStop = nextEntry;
-            System.out.println(String.format("Delay: %s Time: %s Delayed time: %s", delay, time, time.minus(delay)));
             nextEntry = timetable.getNextEntry(time.minus(delay), getLine().getStops());
             if(nextEntry == null) {
                 if(timetable.getEntries().size() > 0)
@@ -229,7 +275,7 @@ public class Vehicle implements Drawable, Selectable<Vehicle> {
 
         if(path == null) {
             path = line.getPathToNextStop(currentStop.getStop(), nextEntry.getStop());
-            drivenDistance = getDrivenDistanceByTime(currentStop.getTime(), time, nextEntry.getTime().plus(path.getDelay()), path.getPathLenght());
+            drivenDistance = getDrivenDistanceByTime(currentStop.getTime(), time, nextEntry.getTime().plus(path.getDelay()), path.getPathLength());
             inStop = false;
             if(path == null) {
                 return;
@@ -238,11 +284,10 @@ public class Vehicle implements Drawable, Selectable<Vehicle> {
 
         PositionInfo info = path.getPathInfoByDistance(drivenDistance);
         if(!inStop) {
-            System.out.println(speed * (1 - info.getStreet().getTraffic()));
             drivenDistance += speed * (1 - info.getStreet().getTraffic());
         }
 
-        if(drivenDistance > path.getPathLenght()) {
+        if(drivenDistance > path.getPathLength()) {
             inStop = true;
         }
 
@@ -296,7 +341,15 @@ public class Vehicle implements Drawable, Selectable<Vehicle> {
         }
     }
 
+    /**
+     * Class responsible for calling post construct after jackson deserialization completes
+     */
     public static class VehicleSanitizer extends StdConverter<Vehicle,Vehicle> {
+        /**
+         * Is called after jackson deserialization completes
+         * @param vehicle Vehicle that completed deserialization
+         * @return Vehicle that completed deserialization
+         */
         @Override
         public Vehicle convert(Vehicle vehicle) {
             vehicle.postConstruct();

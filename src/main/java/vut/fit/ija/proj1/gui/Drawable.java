@@ -1,6 +1,5 @@
 package vut.fit.ija.proj1.gui;
 
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.shape.Shape;
 import vut.fit.ija.proj1.data.Coordinates;
 

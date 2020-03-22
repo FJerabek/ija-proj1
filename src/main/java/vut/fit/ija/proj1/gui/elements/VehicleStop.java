@@ -1,7 +1,10 @@
+/**
+ * @author xjerab25
+ * File containing definition of {@link vut.fit.ija.proj1.gui.elements.VehicleStop} class representing stop on map
+ */
 package vut.fit.ija.proj1.gui.elements;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import javafx.scene.paint.Color;
@@ -36,7 +39,10 @@ public class VehicleStop implements Drawable, Selectable<VehicleStop> {
     private OnSelect<VehicleStop> onSelectListener;
     private Circle selectableGui;
 
-    public VehicleStop() {
+    /**
+     * Default constructor for jackson deserialization
+     */
+    private VehicleStop() {
     }
 
     /**
@@ -57,11 +63,18 @@ public class VehicleStop implements Drawable, Selectable<VehicleStop> {
         return id;
     }
 
+    /**
+     * Sets gui properties for selected state
+     */
     private void selectGui() {
         selectableGui.setRadius(8);
         selectableGui.setFill(SELECTED_COLOR);
     }
 
+
+    /**
+     * Sets gui properties for deselected state
+     */
     private void deselectGui() {
         selectableGui.setRadius(5);
         selectableGui.setFill(Color.RED);

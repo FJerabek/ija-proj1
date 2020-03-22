@@ -1,3 +1,7 @@
+/**
+ * @author xjerab25
+ * File containing definition of {@link vut.fit.ija.proj1.data.Timetable} class representing vehicle timetable
+ */
 package vut.fit.ija.proj1.data;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -9,14 +13,17 @@ import java.time.LocalTime;
 import java.util.List;
 
 /**
- * Class representing timetable
+ * Class representing vehicle timetable
  */
 @JsonIdentityInfo(generator = ObjectIdGenerators.None.class)
 public class Timetable {
     private List<TimetableEntry> entries;
     private int i = 0;
 
-    public Timetable() {
+    /**
+     * Default constructor for jackson deserialization
+     */
+    private Timetable() {
     }
 
     /**
@@ -37,9 +44,10 @@ public class Timetable {
 
 
     /**
-     * Return next timetable entry according to time
-     * @param currentTime current time
-     * @return next timetable entry
+     * Return closest next {@link TimetableEntry} according to time and provided stops
+     * @param currentTime time to find closest next timetable entry
+     * @param stops stops to find timetable entry for
+     * @return closest next timetable entry on one of provided stops
      */
     @JsonIgnore
     public TimetableEntry getNextEntry(LocalTime currentTime, List<VehicleStop> stops) {
@@ -57,6 +65,12 @@ public class Timetable {
         return next;
     }
 
+    /**
+     * Returns closest previous {@link TimetableEntry} in timeline
+     * @param currentTime time to find closest previous timetable entry
+     * @param stops stops to find timetable entry for
+     * @return closest previous timetable entry on one of provided stops
+     */
     @JsonIgnore
     public TimetableEntry getPreviousEntry(LocalTime currentTime, List<VehicleStop> stops) {
         TimetableEntry previous = null;

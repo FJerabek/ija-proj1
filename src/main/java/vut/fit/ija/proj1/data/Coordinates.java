@@ -1,3 +1,7 @@
+/**
+ * @author xjerab25
+ * Contains definition of {@link vut.fit.ija.proj1.data.Coordinates} class which represents coordinates on map
+ */
 package vut.fit.ija.proj1.data;
 
 import java.util.Objects;
@@ -9,7 +13,10 @@ public class Coordinates {
     private double x;
     private double y;
 
-    public Coordinates() {
+    /**
+     * Empty constructor for jackson deserialization
+     */
+    private Coordinates() {
     }
 
     /**

@@ -1,3 +1,7 @@
+/**
+ * @author xjerab25
+ * File containing definition of {@link vut.fit.ija.proj1.gui.elements.Street} class representing street on map
+ */
 package vut.fit.ija.proj1.gui.elements;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -48,7 +52,10 @@ public class Street implements Drawable, Selectable<Street> {
     private boolean selected;
     private boolean selectable = true;
 
-    public Street() {
+    /**
+     * Default constructor for jackson deserialization
+     */
+    private Street() {
     }
 
     /**
@@ -80,18 +87,35 @@ public class Street implements Drawable, Selectable<Street> {
         );
     }
 
+    /**
+     * Returns traffic on street in range from 0(lowest) 1(highest)
+     * @return street traffic
+     */
     public double getTraffic() {
         return traffic;
     }
 
+    /**
+     * Sets street traffic must be in range from 0 to 1
+     * @param traffic street traffic
+     */
     public void setTraffic(double traffic) {
+        assert traffic < 1 && traffic > 0;
         this.traffic = traffic;
     }
 
+    /**
+     * Returns if street is closed
+     * @return street is closed
+     */
     public boolean isClosed() {
         return closed;
     }
 
+    /**
+     * Sets if street is closed
+     * @param closed street is closed
+     */
     public void setClosed(boolean closed) {
         this.closed = closed;
         gui.forEach(shape -> {
@@ -110,6 +134,10 @@ public class Street implements Drawable, Selectable<Street> {
         }
     }
 
+    /**
+     * Sets listener for street closing
+     * @param closedListener street closing listener
+     */
     public void setClosedListener(OnStreetClosed closedListener) {
         this.closedListener = closedListener;
     }
@@ -146,6 +174,11 @@ public class Street implements Drawable, Selectable<Street> {
         return to;
     }
 
+    /**
+     * Gets coordinates of street crossing. Its either starting or ending street coordinates, null if its neither if them
+     * @param street street to find crossing coordinates for
+     * @return coordinates if crossing is found null otherwise
+     */
     public Coordinates getCrossingCoordinates(Street street) {
         if(getTo().equals(street.getTo()) || getTo().equals(street.getFrom())) {
             return getTo();
@@ -156,16 +189,26 @@ public class Street implements Drawable, Selectable<Street> {
         }
     }
 
+    /**
+     * Sets gui properties for not selected state
+     */
     private void deselectGui() {
         selectableGui.setStroke(Color.BLACK);
         selectableGui.setStrokeWidth(1);
     }
 
+    /**
+     * Sets gui properties for selected state
+     */
     private void selectGui() {
         selectableGui.setStroke(SELECTED_COLOR);
         selectableGui.setStrokeWidth(3);
     }
 
+
+    /**
+     * Gets called after jackson finishes data deserialization
+     */
     private void jacksonPostConstruct() {
         selectableGui = new Line(from.getX(), from.getY(), to.getX(), to.getY());
         gui = Arrays.asList(
@@ -204,6 +247,10 @@ public class Street implements Drawable, Selectable<Street> {
         }
     }
 
+    /**
+     * Returns coordinates in the middle of the street
+     * @return coordinates in the middle of the street
+     */
     @JsonIgnore
     @Override
     public Coordinates getCoordinates() {
@@ -263,13 +310,27 @@ public class Street implements Drawable, Selectable<Street> {
         return Objects.hash(name);
     }
 
+    /**
+     * Interface representing listener, that gets called when street is closed
+     */
     public interface OnStreetClosed {
-
+        /**
+         * Gets called when street is closed
+         * @param street closing street
+         */
         void onClosed(Street street);
     }
+
+    /**
+     * Class responsible for calling post construct
+     */
     static class StreetSanitizer extends StdConverter<Street, Street> {
 
-
+        /**
+         * Gets called after jackson deserialization
+         * @param value street which finished deserialization
+         * @return street which finished deserialization
+         */
         @Override
         public Street convert(Street value) {
             value.jacksonPostConstruct();

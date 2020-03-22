@@ -1,3 +1,7 @@
+/**
+ * @author xjerab25
+ * File containing definition of {@link vut.fit.ija.proj1.gui.LineModifyMode} class representing line modification mode gui
+ */
 package vut.fit.ija.proj1.gui;
 
 import javafx.collections.FXCollections;
@@ -5,7 +9,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
 import vut.fit.ija.proj1.data.PathBetweenStops;
 import vut.fit.ija.proj1.data.VehicleLine;
@@ -18,6 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Class representing line modification mode gui
+ */
 public class LineModifyMode {
     private static final Color SELECTED_PATH_COLOR = Color.valueOf("#1565c0");
     private final Shape[] selectedPath = {null};
@@ -35,6 +41,10 @@ public class LineModifyMode {
     private boolean pathAdding = false;
     private Runnable onStopsSelectionEnd;
 
+    /**
+     * Asks user for setting new path delay
+     * @return path delay in seconds
+     */
     private int getNewPathDelay() {
         boolean failed = true;
         int intResult = 0;
@@ -63,6 +73,13 @@ public class LineModifyMode {
         return intResult;
     }
 
+    /**
+     * Shows dialog to the user
+     * @param type dialog type
+     * @param title dialog title
+     * @param header dialog header
+     * @param content dialog content
+     */
     private void showDialog(Alert.AlertType type, String title, String header, String content) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
@@ -71,6 +88,15 @@ public class LineModifyMode {
         alert.showAndWait();
     }
 
+    /**
+     * Construct new gui for line modify mode
+     * @param content content with map
+     * @param lineListView listView of lines
+     * @param stopListView listView of line stops
+     * @param pathListView listView of path between stops on line
+     * @param lines lines
+     * @param exitLineModifyButton button for exiting line modify mode
+     */
     public LineModifyMode(Pane content,
                           ListView<VehicleLine> lineListView,
                           ListView<VehicleStop> stopListView,
@@ -89,6 +115,9 @@ public class LineModifyMode {
         setupLineModify();
     }
 
+    /**
+     * Updates list views with new Path
+     */
     private void updateListsAfterNewPath() {
         lineListView.refresh();
         ObservableList<PathBetweenStops> paths = pathListView.getItems();
@@ -97,6 +126,9 @@ public class LineModifyMode {
         pathListView.refresh();
     }
 
+    /**
+     * Sets line factories for listViews
+     */
     private void setLineFactories() {
         stopListView.setCellFactory(param -> new ListCell<VehicleStop>() {
             @Override
@@ -162,12 +194,19 @@ public class LineModifyMode {
         } );
     }
 
+    /**
+     * Cleans gui from all content modified by line modify mode
+     */
     public void clean() {
         for (VehicleStop stop: selectedStops) {
             stop.setSelected(false);
         }
     }
 
+    /**
+     * Returns if all problems has ben resolved.
+     * @return true il all problems has ben resolved false otherwise
+     */
     public boolean canExit() {
         for(VehicleLine line : lines) {
             List<VehicleStop> stops = line.getStops();
@@ -195,6 +234,9 @@ public class LineModifyMode {
         return true;
     }
 
+    /**
+     * Setups line modify mode
+     */
     public void setupLineModify() {
         setLineFactories();
 
@@ -222,12 +264,19 @@ public class LineModifyMode {
         });
     }
 
+    /**
+     * Deletes stop from currently selected line
+     * @param stop deleting stop
+     */
     private void deleteStop(VehicleStop stop) {
         VehicleLine line = lineListView.getSelectionModel().getSelectedItem();
         line.getStops().remove(stop);
         stopListView.getItems().remove(stop);
     }
 
+    /**
+     * Deselect all map gui elements
+     */
     private void deselectAll() {
         if(selectedPath[0] != null)
             content.getChildren().remove(selectedPath[0]);
@@ -236,6 +285,10 @@ public class LineModifyMode {
             stop.setSelected(false);
     }
 
+    /**
+     * Starts editing of provided path
+     * @param path editing path
+     */
     private void editPath(PathBetweenStops path) {
         currentEdit = path;
         currentEditLine = lineListView.getSelectionModel().getSelectedItem();
@@ -247,6 +300,10 @@ public class LineModifyMode {
         deselectAll();
     }
 
+    /**
+     * Returns new on street select listener for line modify mode
+     * @return new on street select listener
+     */
     public OnSelect<Street> getOnStreetSelectListener() {
         return new OnSelect<Street>() {
             @Override
@@ -337,12 +394,20 @@ public class LineModifyMode {
         };
     }
 
+    /**
+     * Deletes provided path between stops
+     * @param path path for deletion
+     */
     private void deletePath(PathBetweenStops path) {
         VehicleLine line = lineListView.getSelectionModel().getSelectedItem();
         line.getStopsPath().remove(path);
         pathListView.getItems().remove(path);
     }
 
+    /**
+     * Starts adding of new path between stops
+     * @param onStopsSelectionEnd path to add
+     */
     public void addPath(Runnable onStopsSelectionEnd) {
         this.onStopsSelectionEnd = onStopsSelectionEnd;
         showDialog(Alert.AlertType.INFORMATION,
@@ -356,6 +421,10 @@ public class LineModifyMode {
         pathAdding = true;
     }
 
+    /**
+     * Returns new on stop selected listener for line modify mode
+     * @return new on stop selected listener
+     */
     public OnSelect<VehicleStop> getOnStopSelectedListener() {
         return new OnSelect<VehicleStop>() {
             @Override

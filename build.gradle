@@ -21,6 +21,6 @@ dependencies {
 }
 
 task copyToLib(type: Copy) {
-    into "libs"
+    into "lib"
     from configurations.runtimeClasspath
 }

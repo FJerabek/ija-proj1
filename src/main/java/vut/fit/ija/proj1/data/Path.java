@@ -1,3 +1,7 @@
+/**
+ * @author xjerab25
+ * Contains definition of {@link vut.fit.ija.proj1.data.Path} class representing path on map
+ */
 package vut.fit.ija.proj1.data;
 
 import javafx.scene.shape.Line;
@@ -10,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Class representing path in the map
+ * Class representing path on the map
  */
 public class Path {
     private Coordinates startCoordinates;
@@ -21,6 +25,12 @@ public class Path {
 
     /**
      * Constructs a new path
+     * Provided streets must connect with one of ending coordinates and be in order in which path is being taken
+     * @param startCoordinates Starting coordinates
+     * @param stopCoordinates End coordinates
+     * @param streets Streets streets which path goes through
+     * @param delay path delay
+     * @throws StreetsNotConnectedException when provided streets starting or ending coordinates does not connect
      */
     public Path(Coordinates startCoordinates, Coordinates stopCoordinates, List<Street> streets, Duration delay) throws StreetsNotConnectedException {
         this.startCoordinates = startCoordinates;
@@ -30,6 +40,11 @@ public class Path {
         path = constructPath();
     }
 
+    /**
+     * Construct path as list of coordinates
+     * @return path as list of coordinates
+     * @throws StreetsNotConnectedException when path streets starting or ending coordinates does not connect
+     */
     private List<Coordinates> constructPath() throws StreetsNotConnectedException {
         ArrayList<Coordinates> path = new ArrayList<>();
         path.add(startCoordinates);
@@ -45,14 +60,18 @@ public class Path {
         return path;
     }
 
+    /**
+     * Returns path delay
+     * @return path delay
+     */
     public Duration getDelay() {
         return delay;
     }
 
     /**
-     * Returns a coordinates on path at set distance
+     * Returns a {@link PositionInfo} on path at set distance
      * @param distance distance
-     * @return coordinates on path at set distance
+     * @return {@link PositionInfo} on path at set distance
      */
     public PositionInfo getPathInfoByDistance(double distance) {
         if(path.size() == 1) {
@@ -60,7 +79,7 @@ public class Path {
         } else if(path.size() == 0){
             return null;
         }
-        if(distance >= getPathLenght()) {
+        if(distance >= getPathLength()) {
             return new PositionInfo(path.get(path.size() - 1), streets.get(streets.size() - 1));
         }
         Coordinates a = null;
@@ -88,7 +107,7 @@ public class Path {
 
     /**
      * Returns path as shape on map
-     * @return shape on map
+     * @return Path as shape on map
      */
     public Shape getShape() {
         Shape shape = null;
@@ -113,7 +132,7 @@ public class Path {
      * Calculates the path length
      * @return path length
      */
-    public double getPathLenght() {
+    public double getPathLength() {
         double length = 0;
         for (int i = 0; i < path.size() - 1; i++) {
             Coordinates a = path.get(i);

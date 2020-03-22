@@ -1,13 +1,18 @@
+/***
+ * @author xjerab25
+ * File containing definition of {@link vut.fit.ija.proj1.data.VehicleLine} class representing a vehicle line
+ */
 package vut.fit.ija.proj1.data;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
-import vut.fit.ija.proj1.data.exceptions.StreetsNotConnectedException;
 import vut.fit.ija.proj1.gui.elements.VehicleStop;
-import vut.fit.ija.proj1.gui.elements.Street;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * Represents a line that vehicle takes
@@ -20,7 +25,10 @@ public class VehicleLine {
     @JsonProperty("stopPaths")
     private List<PathBetweenStops> stopsPath;
 
-    public VehicleLine() {
+    /**
+     * Default constructor for jackson deserialization
+     */
+    private VehicleLine() {
     }
 
     /**
@@ -28,6 +36,7 @@ public class VehicleLine {
      * @param stops Stops on line
      * @param name Line name
      * @param color Line color
+     * @param stopsPath path between every two stops that vehicle takes
      */
     public VehicleLine(List<VehicleStop> stops, String name, Color color, List<PathBetweenStops> stopsPath) {
         this.stops = stops;
@@ -36,6 +45,10 @@ public class VehicleLine {
         this.stopsPath = stopsPath;
     }
 
+    /**
+     * Returns paths between stops
+     * @return paths between stops
+     */
     public List<PathBetweenStops> getStopsPath() {
         return stopsPath;
     }
@@ -43,6 +56,7 @@ public class VehicleLine {
     /**
      * Returns path to the next stop
      * @param currentStop Current stop
+     * @param nextStop Next stop
      * @return path to the next stop on this line
      */
     @JsonIgnore
@@ -65,6 +79,10 @@ public class VehicleLine {
         return stops;
     }
 
+    /**
+     * Returns line color
+     * @return line color
+     */
     public Color getColor() {
         return color;
     }
@@ -77,6 +95,10 @@ public class VehicleLine {
         return name;
     }
 
+    /**
+     * Returns gui representation of vehicle line
+     * @return shape of path on map
+     */
     @JsonIgnore
     public Shape getGui() {
         Shape shape = null;

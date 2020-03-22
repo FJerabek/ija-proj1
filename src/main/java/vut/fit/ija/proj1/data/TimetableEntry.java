@@ -1,3 +1,8 @@
+/**
+ * @authors xjerab25
+ * File containing definition of {@link vut.fit.ija.proj1.data.TimetableEntry}  class representing entry in
+ * {@link vut.fit.ija.proj1.data.Timetable}
+ */
 package vut.fit.ija.proj1.data;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -8,18 +13,21 @@ import java.time.LocalTime;
 import java.util.Objects;
 
 /**
- * Class representing single timetable entry
+ * Class representing single entry in {@link Timetable}
  */
 @JsonIdentityInfo(generator = ObjectIdGenerators.None.class)
 public class TimetableEntry {
     private VehicleStop stop;
     private LocalTime time;
 
-    public TimetableEntry() {
+    /**
+     * Default constructor for jackson deserialization
+     */
+    private TimetableEntry() {
     }
 
     /**
-     * Timietable entry constructor
+     * Constructs new timetable entry
      * @param stop stop
      * @param time time
      */
