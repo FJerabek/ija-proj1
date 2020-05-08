@@ -198,9 +198,7 @@ public class LineModifyMode {
      * Cleans gui from all content modified by line modify mode
      */
     public void clean() {
-        for (VehicleStop stop: selectedStops) {
-            stop.setSelected(false);
-        }
+        deselectAll();
     }
 
     /**
@@ -239,8 +237,9 @@ public class LineModifyMode {
      */
     public void setupLineModify() {
         setLineFactories();
-
-        lineListView.setItems(FXCollections.observableArrayList(lines));
+        if(lines != null) {
+            lineListView.setItems(FXCollections.observableArrayList(lines));
+        }
         lineListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             stopListView.setItems(FXCollections.observableArrayList(newValue.getStops()));
             pathListView.setItems(FXCollections.observableArrayList(newValue.getStopsPath()));
@@ -249,7 +248,9 @@ public class LineModifyMode {
         stopListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if(oldValue != null)
                 oldValue.setSelected(false);
+                selectedStops.remove(oldValue);
             if(newValue != null)
+                selectedStops.add(newValue);
                 newValue.setSelected(true);
         });
 
@@ -290,6 +291,7 @@ public class LineModifyMode {
      * @param path editing path
      */
     private void editPath(PathBetweenStops path) {
+        deselectAll();
         currentEdit = path;
         currentEditLine = lineListView.getSelectionModel().getSelectedItem();
         newPath = new ArrayList<>();
@@ -409,6 +411,7 @@ public class LineModifyMode {
      * @param onStopsSelectionEnd path to add
      */
     public void addPath(Runnable onStopsSelectionEnd) {
+        deselectAll();
         this.onStopsSelectionEnd = onStopsSelectionEnd;
         showDialog(Alert.AlertType.INFORMATION,
                 "Select stops",

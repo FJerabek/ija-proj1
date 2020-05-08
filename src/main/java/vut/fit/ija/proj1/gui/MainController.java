@@ -176,6 +176,7 @@ public class MainController {
      * @param vehicles vehicles
      */
     public void setVehicles(List<Vehicle> vehicles) {
+        if(vehicles == null) return;
         this.vehicles = vehicles;
         for(Vehicle vehicle : vehicles) {
             content.getChildren().addAll(vehicle.draw());
@@ -250,6 +251,9 @@ public class MainController {
      * @param callback on vehicle select listener
      */
     private void setVehicleOnSelectCallback(OnSelect<Vehicle> callback) {
+        if(vehicles == null) {
+            return;
+        }
         for (Vehicle vehicle :
                 vehicles) {
             vehicle.setOnSelect(callback);
@@ -264,11 +268,13 @@ public class MainController {
             street.setClosedListener(closedStreet -> {
                 boolean flagInvalid = false;
                 //Check vehicle paths for closed street
-                for(VehicleLine line : lines) {
-                    for(PathBetweenStops path : line.getStopsPath()) {
-                        if(path.getStreetPath().contains(closedStreet)) {
-                            flagInvalid = true;
-                            path.setInvalid(true);
+                if(lines != null) {
+                    for (VehicleLine line : lines) {
+                        for (PathBetweenStops path : line.getStopsPath()) {
+                            if (path.getStreetPath().contains(closedStreet)) {
+                                flagInvalid = true;
+                                path.setInvalid(true);
+                            }
                         }
                     }
                 }
@@ -380,6 +386,7 @@ public class MainController {
                     Platform.runLater(() -> {
                         localTime = localTime.plusSeconds(1);
                         time.setText(localTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+                        if(vehicles == null) return;
                         for (Vehicle vehicle : vehicles) {
                             vehicle.drive(localTime);
                         }

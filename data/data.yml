@@ -1,483 +1,649 @@
 stops:
-  -
-    &stop1
-    id: "Stop 1"
+  - &Stop0 id: "Stop 0"
     coordinates:
-      x: 475.0
-      y: 444.0
-  -
-    &stop2
-    id: "Stop 2"
+      x: 183.0677409260761
+      y: 456.3495878000292
+  - &Stop1 id: "Stop 1"
     coordinates:
-      x: 339.0
-      y: 689.0
-  -
-    &stop3
-    id: "Stop 3"
+      x: 45.32815395963611
+      y: 696.58043147217
+  - &Stop2 id: "Stop 2"
     coordinates:
-      x: 600.0
-      y: 200.0
-  -
-    &stop4
-    id: "Stop4"
+      x: 445.7760090815578
+      y: 952.3824519448955
+  - &Stop3 id: "Stop 3"
     coordinates:
-      x: 242.0
-      y: 193.0
-  -
-    &stop5
-    id: "Stop5"
+      x: 303.59761459511634
+      y: 646.3168483460976
+  - &Stop4 id: "Stop 4"
     coordinates:
-      x: 700.0
-      y: 500.0
-  -
-    &stop6
-    id: "Stop6"
+      x: 320.35372740860674
+      y: 741.7538387185864
+  - &Stop6 id: "Stop 6"
     coordinates:
-      x: 860.0
-      y: 250.0
-  -
-    &stop7
-    id: "Stop7"
+      x: 857.5674379470634
+      y: 85.0709839541858
+  - &Stop8 id: "Stop 8"
     coordinates:
-      x: 600.0
-      y: 350.0
-  -
-    &stop8
-    id: "Stop8"
+      x: 369.6727312024558
+      y: 292.1090871148703
+  - &Stop9 id: "Stop 9"
     coordinates:
-      x: 600.0
-      y: 400.0
+      x: 494.31398583379917
+      y: 399.26999450316424
+  - &Stop10 id: "Stop 10"
+    coordinates:
+      x: 709.574260712917
+      y: 337.57708373339955
+  - &Stop11 id: "Stop 11"
+    coordinates:
+      x: 921.5596685282586
+      y: 732.9817457029739
+  - &Stop12 id: "Stop 12"
+    coordinates:
+      x: 663.9091337302374
+      y: 610.1261318762364
+  - &Stop14 id: "Stop 14"
+    coordinates:
+      x: 631.2569081683835
+      y: 804.3252076596085
 streets:
-  -
-    &street1 name: "Street 1"
-    stops:
-      - *stop1
-      - *stop2
+  - &Street0 name: "Street 0"
+    stops: []
     from:
-      x: 475.0
-      y: 444.0
+      x: 106.0
+      y: 152.0
     to:
-      x: 339.0
-      y: 689.0
-  -
-    &street2 name: "Street 2"
+      x: 260.0
+      y: 398.0
+    closed: false
+    traffic: 0.0
+  - &Street1 name: "Street 1"
     stops:
-      - *stop1
-      - *stop4
+      - *Stop0
     from:
-      x: 475.0
-      y: 444.0
+      x: 260.0
+      y: 398.0
     to:
-      x: 242.0
-      y: 193.0
-  -
-    &street3 name: "Street 3"
+      x: 53.0
+      y: 555.0
+    closed: false
+    traffic: 0.0
+  - &Street2 name: "Street 2"
+    stops: []
+    from:
+      x: 53.0
+      y: 555.0
+    to:
+      x: 106.0
+      y: 152.0
+    closed: false
+    traffic: 0.0
+  - &Street3 name: "Street 3"
     stops:
-      - *stop2
-      - *stop4
+      - *Stop1
     from:
-      x: 339.0
-      y: 689.0
+      x: 53.0
+      y: 555.0
     to:
-      x: 242.0
-      y: 193.0
-  -
-    &street4 name: "Street 4"
+      x: 42.0
+      y: 758.0
+    closed: false
+    traffic: 0.0
+  - &Street4 name: "Street 4"
+    stops: []
+    from:
+      x: 42.0
+      y: 758.0
+    to:
+      x: 186.0
+      y: 963.0
+    closed: false
+    traffic: 0.0
+  - &Street5 name: "Street 5"
     stops:
-      - *stop1
+      - *Stop2
     from:
-      x: 475.0
-      y: 444.0
+      x: 186.0
+      y: 963.0
     to:
-      x: 600.0
-      y: 444.0
-  -
-    &street5 name: "Street 5"
+      x: 553.0
+      y: 948.0
+    closed: false
+    traffic: 0.0
+  - &Street6 name: "Street 6"
+    stops: []
+    from:
+      x: 186.0
+      y: 963.0
+    to:
+      x: 329.0
+      y: 791.0
+    closed: false
+    traffic: 0.0
+  - &Street7 name: "Street 7"
     stops:
-      - *stop3
-      - *stop7
-      - *stop8
+      - *Stop3
+      - *Stop4
     from:
-      x: 600.0
-      y: 444.0
+      x: 329.0
+      y: 791.0
     to:
-      x: 600.0
-      y: 200.0
-  -
-    &street6 name: "Street 6"
+      x: 260.0
+      y: 398.0
+    closed: false
+    traffic: 0.0
+  - &Street8 name: "Street 8"
+    stops: []
+    from:
+      x: 329.0
+      y: 791.0
+    to:
+      x: 553.0
+      y: 948.0
+    closed: false
+    traffic: 0.0
+  - &Street9 name: "Street 9"
+    stops: []
+    from:
+      x: 106.0
+      y: 152.0
+    to:
+      x: 345.0
+      y: 31.0
+    closed: false
+    traffic: 0.0
+  - &Street10 name: "Street 10"
+    stops: []
+    from:
+      x: 345.0
+      y: 31.0
+    to:
+      x: 637.0
+      y: 34.0
+    closed: false
+    traffic: 0.0
+  - &Street11 name: "Street 11"
     stops:
-      - *stop3
+      - *Stop6
     from:
-      x: 600.0
-      y: 200.0
+      x: 637.0
+      y: 34.0
     to:
-      x: 300.0
-      y: 100.0
-  -
-    &street7 name: "Street 7"
+      x: 935.0
+      y: 103.0
+    closed: false
+    traffic: 0.0
+  - &Street12 name: "Street 12"
+    stops: []
+    from:
+      x: 260.0
+      y: 398.0
+    to:
+      x: 345.0
+      y: 31.0
+    closed: false
+    traffic: 0.0
+  - &Street13 name: "Street 13"
     stops:
-      - *stop4
+      - *Stop8
     from:
-      x: 300.0
-      y: 100.0
+      x: 260.0
+      y: 398.0
     to:
-      x: 242.0
-      y: 193.0
-  -
-    &street8 name: "Street 8"
+      x: 637.0
+      y: 34.0
+    closed: false
+    traffic: 0.0
+  - &Street14 name: "Street 14"
+    stops: []
+    from:
+      x: 637.0
+      y: 34.0
+    to:
+      x: 629.0
+      y: 400.0
+    closed: false
+    traffic: 0.0
+  - &Street15 name: "Street 15"
     stops:
-      - *stop2
+      - *Stop9
     from:
-      x: 339.0
-      y: 689.0
+      x: 260.0
+      y: 398.0
     to:
-      x: 850.0
-      y: 800.0
-  -
-    &street9 name: "Street 9"
+      x: 629.0
+      y: 400.0
+    closed: false
+    traffic: 0.0
+  - &Street16 name: "Street 16"
     stops:
-      - *stop5
+      - *Stop10
     from:
-      x: 850.0
-      y: 800.0
+      x: 629.0
+      y: 400.0
     to:
-      x: 700.0
-      y: 500.0
-  -
-    &street10 name: "Street 10"
+      x: 811.0
+      y: 259.0
+    closed: false
+    traffic: 0.0
+  - &Street17 name: "Street 17"
+    stops: []
+    from:
+      x: 811.0
+      y: 259.0
+    to:
+      x: 935.0
+      y: 103.0
+    closed: false
+    traffic: 0.0
+  - &Street18 name: "Street 18"
+    stops: []
+    from:
+      x: 811.0
+      y: 259.0
+    to:
+      x: 942.0
+      y: 576.0
+    closed: false
+    traffic: 0.0
+  - &Street19 name: "Street 19"
     stops:
-      - *stop5
+      - *Stop11
     from:
-      x: 700.0
-      y: 500.0
+      x: 942.0
+      y: 576.0
     to:
-      x: 600.0
-      y: 444.0
-  -
-    &street11 name: "Street 11"
+      x: 917.0
+      y: 768.0
+    closed: false
+    traffic: 0.0
+  - &Street20 name: "Street 20"
+    stops: []
+    from:
+      x: 942.0
+      y: 576.0
+    to:
+      x: 681.0
+      y: 713.0
+    closed: false
+    traffic: 0.0
+  - &Street21 name: "Street 21"
     stops:
-      - *stop5
-      - *stop6
+      - *Stop12
     from:
-      x: 700.0
-      y: 500.0
+      x: 629.0
+      y: 400.0
     to:
-      x: 860.0
-      y: 250.0
-  -
-    &street12 name: "Street 12"
+      x: 681.0
+      y: 713.0
+    closed: false
+    traffic: 0.0
+  - &Street22 name: "Street 22"
+    stops: []
+    from:
+      x: 329.0
+      y: 791.0
+    to:
+      x: 681.0
+      y: 713.0
+    closed: false
+    traffic: 0.0
+  - &Street24 name: "Street 24"
     stops:
-      - *stop6
-      - *stop3
+      - *Stop14
     from:
-      x: 860.0
-      y: 250.0
+      x: 553.0
+      y: 948.0
     to:
-      x: 600.0
-      y: 200.0
+      x: 681.0
+      y: 713.0
+    closed: false
+    traffic: 0.0
+  - &Street25 name: "Street 25"
+    stops: []
+    from:
+      x: 553.0
+      y: 948.0
+    to:
+      x: 880.0
+      y: 905.0
+    closed: false
+    traffic: 0.0
+  - &Street26 name: "Street 26"
+    stops: []
+    from:
+      x: 681.0
+      y: 713.0
+    to:
+      x: 880.0
+      y: 905.0
+    closed: false
+    traffic: 0.0
+
 lines:
   -
     &line1 name: "1"
     color: "#43a047"
     stops:
-      - *stop1
-      - *stop4
-      - *stop3
-      - *stop7
-      - *stop8
-      - *stop1
+      - *Stop1
+      - *Stop0
+      - *Stop3
+      - *Stop4
+      - *Stop1
     stopPaths:
-      - stop1: *stop1
-        stop2: *stop4
+      - stop1: *Stop1
+        stop2: *Stop0
         streetPath:
-          - *street2
+          - *Street3
+          - *Street1
 
-      - stop1: *stop4
-        stop2: *stop3
+      - stop1: *Stop0
+        stop2: *Stop3
         streetPath:
-          - *street7
-          - *street6
+          - *Street1
+          - *Street7
 
-      - stop1: *stop3
-        stop2: *stop7
+      - stop1: *Stop3
+        stop2: *Stop4
         streetPath:
-          - *street5
+          - *Street7
 
-      - stop1: *stop7
-        stop2: *stop8
+      - stop1: *Stop4
+        stop2: *Stop1
         streetPath:
-          - *street5
+          - *Street7
+          - *Street6
+          - *Street4
+          - *Street3
+    timetableCreator:
+      entries:
+        - stop: *Stop1
+          time: "00:00:00"
+        - stop: *Stop0
+          time: "00:03:00"
+        - stop: *Stop3
+          time: "00:06:20"
+        - stop: *Stop4
+          time: "00:07:30"
+        - stop: *Stop1
+          time: "00:13:20"
 
-      - stop1: *stop8
-        stop2: *stop1
-        streetPath:
-          - *street5
-          - *street4
   -
     &line2 name: "2"
-    color: "#fb8c00"
+    color: "#ffa000"
     stops:
-      - *stop2
-      - *stop1
-      - *stop5
+      - *Stop4
+      - *Stop3
+      - *Stop9
+      - *Stop10
+      - *Stop9
+      - *Stop3
+      - *Stop4
     stopPaths:
-      - stop1: *stop2
-        stop2: *stop1
+      - stop1: *Stop4
+        stop2: *Stop3
         streetPath:
-          - *street1
+          - *Street7
 
-      - stop1: *stop1
-        stop2: *stop5
-#        streetPath:
-#          - *street4
-#          - *street10
+      - stop1: *Stop3
+        stop2: *Stop9
         streetPath:
-          - *street4
-          - *street5
-          - *street12
-          - *street11
+          - *Street7
+          - *Street15
+
+      - stop1: *Stop9
+        stop2: *Stop10
+        streetPath:
+          - *Street15
+          - *Street16
+
+    timetableCreator:
+      entries:
+        - stop: *Stop4
+          time: "00:00:00"
+        - stop: *Stop3
+          time: "00:01:30"
+        - stop: *Stop9
+          time: "00:06:00"
+        - stop: *Stop10
+          time: "00:09:00"
+        - stop: *Stop9
+          time: "00:12:00"
+        - stop: *Stop3
+          time: "00:16:30"
+        - stop: *Stop4
+          time: "00:18:00"
+
+  -
+    &line3 name: "3"
+    color: "#1976d2"
+    stops:
+      - *Stop14
+      - *Stop12
+      - *Stop10
+      - *Stop6
+      - *Stop10
+      - *Stop12
+      - *Stop14
+    stopPaths:
+      - stop1: *Stop14
+        stop2: *Stop12
+        streetPath:
+          - *Street24
+          - *Street21
+
+      - stop1: *Stop12
+        stop2: *Stop10
+        streetPath:
+          - *Street21
+          - *Street16
+
+      - stop1: *Stop10
+        stop2: *Stop6
+        streetPath:
+          - *Street16
+          - *Street17
+          - *Street11
+
+    timetableCreator:
+      entries:
+        - stop: *Stop14
+          time: "00:00:00"
+        - stop: *Stop12
+          time: "00:02:30"
+        - stop: *Stop10
+          time: "00:07:00"
+        - stop: *Stop6
+          time: "00:11:00"
+        - stop: *Stop10
+          time: "00:15:00"
+        - stop: *Stop12
+          time: "00:19:30"
+        - stop: *Stop14
+          time: "00:22:00"
+
+  -
+    &line4 name: "4"
+    color: "#8e24aa"
+    stops:
+      - *Stop2
+      - *Stop14
+      - *Stop11
+    stopPaths:
+      - stop1: *Stop2
+        stop2: *Stop14
+        streetPath:
+          - *Street5
+          - *Street24
+
+      - stop1: *Stop14
+        stop2: *Stop11
+        streetPath:
+          - *Street24
+          - *Street20
+          - *Street19
+    timetableCreator:
+      entries:
+        - stop: *Stop2
+          time: "00:00:00"
+        - stop: *Stop14
+          time: "00:03:00"
+        - stop: *Stop11
+          time: "00:08:00"
+        - stop: *Stop14
+          time: "00:13:00"
+        - stop: *Stop2
+          time: "00:16:00"
+
+  -
+    &line5 name: "5"
+    color: "#26c6da"
+    stops:
+      - *Stop6
+      - *Stop8
+      - *Stop0
+      - *Stop8
+      - *Stop6
+    stopPaths:
+      - stop1: *Stop6
+        stop2: *Stop8
+        streetPath:
+          - *Street11
+          - *Street13
+
+      - stop1: *Stop8
+        stop2: *Stop0
+        streetPath:
+          - *Street13
+          - *Street1
+    timetableCreator:
+      entries:
+        - stop: *Stop6
+          time: "00:00:00"
+        - stop: *Stop8
+          time: "00:07:00"
+        - stop: *Stop0
+          time: "00:10:00"
+        - stop: *Stop8
+          time: "00:13:00"
+        - stop: *Stop6
+          time: "00:20:00"
+
+
 vehicles:
-  -
-    &15 line: *line2
-    speed: 0.5
-    timetable:
-      entries:
-        -
-          stop: *stop5
-          time: "00:10:00"
-        -
-          stop: *stop1
-          time: "01:10:00"
-        -
-          stop: *stop2
-          time: "02:10:00"
-        -
-          stop: *stop1
-          time: "03:10:00"
-        -
-          stop: *stop5
-          time: "04:10:00"
-        -
-          stop: *stop1
-          time: "05:10:00"
-        -
-          stop: *stop2
-          time: "06:10:00"
-        -
-          stop: *stop1
-          time: "07:10:00"
-        -
-          stop: *stop5
-          time: "08:10:00"
-        -
-          stop: *stop1
-          time: "09:10:00"
-        -
-          stop: *stop2
-          time: "10:10:00"
-        -
-          stop: *stop1
-          time: "11:10:00"
-        -
-          stop: *stop5
-          time: "12:10:00"
-        -
-          stop: *stop1
-          time: "13:10:00"
-        -
-          stop: *stop2
-          time: "14:10:00"
-        -
-          stop: *stop1
-          time: "15:10:00"
-        -
-          stop: *stop5
-          time: "16:10:00"
-        -
-          stop: *stop1
-          time: "17:10:00"
-        -
-          stop: *stop2
-          time: "18:10:00"
-        -
-          stop: *stop1
-          time: "19:10:00"
-        -
-          stop: *stop1
-          time: "20:10:00"
-        -
-          stop: *stop2
-          time: "21:10:00"
-        -
-          stop: *stop1
-          time: "22:10:00"
-        -
-          stop: *stop5
-          time: "23:10:00"
-  -
-    line: *line1
-    timetable:
-      entries:
-        -
-          stop: *stop1
-          time: "00:10:00"
-        -
-          stop: *stop4
-          time: "01:10:00"
-        -
-          stop: *stop3
-          time: "02:10:00"
-        -
-          stop: *stop7
-          time: "03:10:00"
-        -
-          stop: *stop8
-          time: "04:10:00"
-        -
-          stop: *stop1
-          time: "05:10:00"
-        -
-          stop: *stop4
-          time: "06:10:00"
-        -
-          stop: *stop3
-          time: "07:10:00"
-        -
-          stop: *stop7
-          time: "08:10:00"
-        -
-          stop: *stop8
-          time: "09:10:00"
-        -
-          stop: *stop1
-          time: "10:10:00"
-        -
-          stop: *stop4
-          time: "11:10:00"
-        -
-          stop: *stop3
-          time: "12:10:00"
-        -
-          stop: *stop7
-          time: "13:10:00"
-        -
-          stop: *stop8
-          time: "14:10:00"
-        -
-          stop: *stop1
-          time: "15:10:00"
-        -
-          stop: *stop4
-          time: "16:10:00"
-        -
-          stop: *stop3
-          time: "17:10:00"
-        -
-          stop: *stop7
-          time: "18:10:00"
-        -
-          stop: *stop8
-          time: "19:10:00"
-        -
-          stop: *stop1
-          time: "20:10:00"
-        -
-          stop: *stop4
-          time: "21:10:00"
-        -
-          stop: *stop3
-          time: "22:10:00"
-        -
-          stop: *stop7
-          time: "23:10:00"
-  -
-    line: *line1
-    timetable:
-      entries:
-        -
-          stop: *stop4
-          time: "00:10:00"
-        -
-          stop: *stop3
-          time: "01:10:00"
-        -
-          stop: *stop7
-          time: "02:10:00"
-        -
-          stop: *stop8
-          time: "03:10:00"
-        -
-          stop: *stop1
-          time: "04:10:00"
-        -
-          stop: *stop4
-          time: "05:10:00"
-        -
-          stop: *stop3
-          time: "06:10:00"
-        -
-          stop: *stop7
-          time: "07:10:00"
-        -
-          stop: *stop8
-          time: "08:10:00"
-        -
-          stop: *stop1
-          time: "09:10:00"
-        -
-          stop: *stop4
-          time: "10:10:00"
-        -
-          stop: *stop3
-          time: "11:10:00"
-        -
-          stop: *stop7
-          time: "12:10:00"
-        -
-          stop: *stop8
-          time: "13:10:00"
-        -
-          stop: *stop1
-          time: "14:10:00"
-        -
-          stop: *stop4
-          time: "10:10:00"
-        -
-          stop: *stop3
-          time: "11:10:00"
-        -
-          stop: *stop7
-          time: "12:10:00"
-        -
-          stop: *stop8
-          time: "13:10:00"
-        -
-          stop: *stop1
-          time: "14:10:00"
-        -
-          stop: *stop4
-          time: "15:10:00"
-        -
-          stop: *stop3
-          time: "16:10:00"
-        -
-          stop: *stop7
-          time: "17:10:00"
-        -
-          stop: *stop8
-          time: "18:10:00"
-        -
-          stop: *stop1
-          time: "19:10:00"
-        -
-          stop: *stop4
-          time: "20:10:00"
-        -
-          stop: *stop3
-          time: "21:10:00"
-        -
-          stop: *stop7
-          time: "22:10:00"
-        -
-          stop: *stop8
-          time: "23:10:00"
+  - line: *line1
+    speed: 2
+    offset: 0
+
+  - line: *line1
+    speed: 2
+    offset: 150
+
+  - line: *line1
+    speed: 2
+    offset: 300
+
+  - line: *line1
+    speed: 2
+    offset: 450
+
+  - line: *line1
+    speed: 2
+    offset: 600
+
+  - line: *line2
+    speed: 2
+    offset: 0
+
+  - line: *line2
+    speed: 2
+    offset: 200
+
+  - line: *line2
+    speed: 2
+    offset: 400
+
+  - line: *line2
+    speed: 2
+    offset: 600
+
+  - line: *line2
+    speed: 2
+    offset: 800
+
+  - line: *line2
+    speed: 2
+    offset: 1000
+
+  - line: *line3
+    speed: 2
+    offset: 0
+
+  - line: *line3
+    speed: 2
+    offset: 200
+
+  - line: *line3
+    speed: 2
+    offset: 400
+
+  - line: *line3
+    speed: 2
+    offset: 600
+
+  - line: *line3
+    speed: 2
+    offset: 600
+
+  - line: *line3
+    speed: 2
+    offset: 600
+
+  - line: *line3
+    speed: 2
+    offset: 800
+
+  - line: *line3
+    speed: 2
+    offset: 1000
+
+  - line: *line4
+    speed: 2
+    offset: 0
+
+  - line: *line4
+    speed: 2
+    offset: 200
+
+  - line: *line4
+    speed: 2
+    offset: 400
+
+  - line: *line4
+    speed: 2
+    offset: 600
+
+  - line: *line4
+    speed: 2
+    offset: 800
+
+  - line: *line5
+    speed: 2
+    offset: 0
+
+  - line: *line5
+    speed: 2
+    offset: 200
+
+  - line: *line5
+    speed: 2
+    offset: 400
+
+  - line: *line5
+    speed: 2
+    offset: 600
+
+  - line: *line5
+    speed: 2
+    offset: 800

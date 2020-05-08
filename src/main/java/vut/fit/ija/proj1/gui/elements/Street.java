@@ -112,10 +112,12 @@ public class Street implements Drawable, Selectable<Street> {
         return closed;
     }
 
+
     /**
      * Sets if street is closed
      * @param closed street is closed
      */
+    @JsonIgnore
     public void setClosed(boolean closed) {
         this.closed = closed;
         gui.forEach(shape -> {

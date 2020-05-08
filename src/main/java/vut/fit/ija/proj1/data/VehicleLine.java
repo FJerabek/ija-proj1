@@ -8,8 +8,11 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import javafx.application.Platform;
+import javafx.scene.control.Slider;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
+import vut.fit.ija.proj1.data.file.TimetableCreator;
 import vut.fit.ija.proj1.gui.elements.VehicleStop;
 
 import java.util.List;
@@ -24,6 +27,9 @@ public class VehicleLine {
     private List<VehicleStop> stops;
     @JsonProperty("stopPaths")
     private List<PathBetweenStops> stopsPath;
+    private TimetableCreator timetableCreator;
+    @JsonIgnore
+    private Timetable timetable;
 
     /**
      * Default constructor for jackson deserialization
@@ -54,6 +60,22 @@ public class VehicleLine {
     }
 
     /**
+     * Gets timetable creator
+     * @return timetable creator
+     */
+    public TimetableCreator getTimetableCreator() {
+        return timetableCreator;
+    }
+
+    /**
+     * Sets timetableCreator
+     * @param timetableCreator timetable creator
+     */
+    public void setTimetableCreator(TimetableCreator timetableCreator) {
+        this.timetableCreator = timetableCreator;
+    }
+
+    /**
      * Returns path to the next stop
      * @param currentStop Current stop
      * @param nextStop Next stop
@@ -61,6 +83,9 @@ public class VehicleLine {
      */
     @JsonIgnore
     public Path getPathToNextStop(VehicleStop currentStop, VehicleStop nextStop) {
+        new Slider().valueProperty().addListener((observable, oldValue, newValue) -> {
+            
+        });
         for(PathBetweenStops path : stopsPath) {
             if(path.getStop1() == currentStop && path.getStop2() == nextStop) {
                 return path.getPathFromStop1();
@@ -93,6 +118,17 @@ public class VehicleLine {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Returns timetable
+     * @return timetable
+     */
+    public Timetable getTimetable() {
+        if(timetable == null) {
+            timetable = timetableCreator.getTimetable();
+        }
+        return timetable;
     }
 
     /**

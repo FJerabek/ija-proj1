@@ -39,7 +39,8 @@ import java.util.Objects;
         "onSelectListener",
         "selectable",
         "selected",
-        "selectableGui"
+        "selectableGui",
+        "timetable"
 })
 @JsonDeserialize(converter=Vehicle.VehicleSanitizer.class)
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
@@ -47,7 +48,6 @@ public class Vehicle implements Drawable, Selectable<Vehicle> {
     private Coordinates position;
     private TimetableEntry currentStop;
     private VehicleLine line;
-    private Timetable timetable;
     @JsonProperty("speed")
     private double speed = 0.5;
     private TimetableEntry nextEntry;
@@ -61,6 +61,8 @@ public class Vehicle implements Drawable, Selectable<Vehicle> {
     private boolean selectable = true;
     private boolean selected;
     private Circle selectableGui;
+    private int offset;
+    Timetable timetable;
 
     /**
      * Default constructor for jackson deserialization
@@ -75,7 +77,6 @@ public class Vehicle implements Drawable, Selectable<Vehicle> {
      */
     public Vehicle(VehicleLine line, Timetable timetable) {
         this.position = timetable.getEntries().get(0).getStop().getCoordinates();
-        this.timetable = timetable;
         this.line = line;
 
         createGui();
@@ -85,6 +86,7 @@ public class Vehicle implements Drawable, Selectable<Vehicle> {
      * Gets called after jackson deserialization completes
      */
     private void postConstruct() {
+        timetable = getLine().getTimetable();
         this.position = timetable.getEntries().get(0).getStop().getCoordinates();
         createGui();
     }
@@ -162,6 +164,22 @@ public class Vehicle implements Drawable, Selectable<Vehicle> {
     }
 
     /**
+     * Gets offset value from line timetable in seconds
+     * @return offset value
+     */
+    public int getOffset() {
+        return offset;
+    }
+
+    /**
+     * Sets offset value from line timetable in seconds
+     * @param offset offset value in seconds
+     */
+    public void setOffset(int offset) {
+        this.offset = offset;
+    }
+
+    /**
      * Returns vehicle timetable
      * @return vehicle timetable
      */
@@ -231,6 +249,7 @@ public class Vehicle implements Drawable, Selectable<Vehicle> {
      * @param time current time
      */
     public void drive(LocalTime time) {
+        time = time.minusSeconds(offset);
         time = time.minus(delay);
         if(currentStop == null) {
             currentStop = timetable.getPreviousEntry(time, getLine().getStops());
@@ -275,11 +294,10 @@ public class Vehicle implements Drawable, Selectable<Vehicle> {
 
         if(path == null) {
             path = line.getPathToNextStop(currentStop.getStop(), nextEntry.getStop());
+            if(path == null)
+                return;
             drivenDistance = getDrivenDistanceByTime(currentStop.getTime(), time, nextEntry.getTime().plus(path.getDelay()), path.getPathLength());
             inStop = false;
-            if(path == null) {
-                return;
-            }
         }
 
         PositionInfo info = path.getPathInfoByDistance(drivenDistance);
