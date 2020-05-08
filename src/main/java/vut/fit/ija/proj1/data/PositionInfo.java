@@ -11,8 +11,8 @@ import vut.fit.ija.proj1.gui.elements.Street;
  * class representing position information on path defined by {@link vut.fit.ija.proj1.data.Path}
  */
 public class PositionInfo {
-    private Coordinates coordinates;
-    private Street street;
+    private final Coordinates coordinates;
+    private final Street street;
 
     /**
      * Creates a new position info

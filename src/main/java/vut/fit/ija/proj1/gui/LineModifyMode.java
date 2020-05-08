@@ -27,17 +27,17 @@ import java.util.Optional;
 public class LineModifyMode {
     private static final Color SELECTED_PATH_COLOR = Color.valueOf("#1565c0");
     private final Shape[] selectedPath = {null};
-    private ListView<VehicleLine> lineListView;
-    private ListView<VehicleStop> stopListView;
-    private List<VehicleStop> selectedStops = new ArrayList<>();
-    private ListView<PathBetweenStops> pathListView;
-    private List<VehicleLine> lines;
-    private Pane content;
+    private final ListView<VehicleLine> lineListView;
+    private final ListView<VehicleStop> stopListView;
+    private final List<VehicleStop> selectedStops = new ArrayList<>();
+    private final ListView<PathBetweenStops> pathListView;
+    private final List<VehicleLine> lines;
+    private final Pane content;
     private PathBetweenStops currentEdit;
     private VehicleLine currentEditLine;
     private VehicleStop targetStop;
     private List<Street> newPath;
-    private Button exitLineModifyButton;
+    private final Button exitLineModifyButton;
     private boolean pathAdding = false;
     private Runnable onStopsSelectionEnd;
 
@@ -139,7 +139,7 @@ public class LineModifyMode {
                     setStyle(null);
                 } else {
                     MenuItem delete = new MenuItem("Delete");
-                    delete.setOnAction(event -> deleteStop(stop));
+                    delete.setOnAction(event -> deleteStop(getIndex()));
                     setContextMenu(new ContextMenu(delete));
                     setText(stop.toString());
                 }
@@ -246,12 +246,14 @@ public class LineModifyMode {
         });
 
         stopListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if(oldValue != null)
+            if(oldValue != null) {
                 oldValue.setSelected(false);
                 selectedStops.remove(oldValue);
-            if(newValue != null)
+            }
+            if(newValue != null) {
                 selectedStops.add(newValue);
                 newValue.setSelected(true);
+            }
         });
 
         pathListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -267,12 +269,12 @@ public class LineModifyMode {
 
     /**
      * Deletes stop from currently selected line
-     * @param stop deleting stop
+     * @param index index of deleting stop
      */
-    private void deleteStop(VehicleStop stop) {
+    private void deleteStop(int index) {
         VehicleLine line = lineListView.getSelectionModel().getSelectedItem();
-        line.getStops().remove(stop);
-        stopListView.getItems().remove(stop);
+        line.getStops().remove(index);
+        stopListView.getItems().remove(index);
     }
 
     /**
@@ -284,6 +286,7 @@ public class LineModifyMode {
 
         for(VehicleStop stop : selectedStops)
             stop.setSelected(false);
+        selectedStops.clear();
     }
 
     /**

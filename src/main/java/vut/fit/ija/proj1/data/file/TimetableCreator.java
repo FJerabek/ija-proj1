@@ -18,9 +18,9 @@ import java.util.List;
 public class TimetableCreator {
     private List<TimetableEntry> entries;
     @JsonIgnore
-    private List<TimetableEntry> timetable = new ArrayList<>();
+    private final List<TimetableEntry> timetable = new ArrayList<>();
     @JsonIgnore
-    private List<Integer> time = new ArrayList<>();
+    private final List<Integer> time = new ArrayList<>();
     @JsonIgnore
     private int secondsOfDay = 0;
 

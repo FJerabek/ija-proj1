@@ -31,7 +31,7 @@ import java.util.Objects;
 })
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class VehicleStop implements Drawable, Selectable<VehicleStop> {
-    private static final Color SELECTED_COLOR = Color.valueOf("#0277bd");
+    private static final Color SELECTED_COLOR = Color.valueOf("#263238");
     private String id;
     private Coordinates coordinates;
     private boolean selected = false;

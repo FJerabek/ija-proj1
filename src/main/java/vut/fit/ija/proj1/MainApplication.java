@@ -17,27 +17,16 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextArea;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import vut.fit.ija.proj1.data.Coordinates;
-import vut.fit.ija.proj1.data.Timetable;
-import vut.fit.ija.proj1.data.TimetableEntry;
 import vut.fit.ija.proj1.data.file.ColorDeserializer;
 import vut.fit.ija.proj1.data.file.Data;
-import vut.fit.ija.proj1.data.file.TimetableCreator;
 import vut.fit.ija.proj1.gui.MainController;
-import vut.fit.ija.proj1.gui.elements.VehicleStop;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.sql.Array;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Represents main application
@@ -67,7 +56,7 @@ public class MainApplication extends Application {
 
 
         try {
-            Data loaded = loadMapLayout(new java.io.File("data/export.yml"));
+            Data loaded = loadMapLayout(new java.io.File("data/data.yml"));
             MainController controller = loader.getController();
 
             controller.setLines(loaded.getLines());
@@ -126,13 +115,5 @@ public class MainApplication extends Application {
         alert.getDialogPane().setExpandableContent(new AnchorPane(textArea));
 
         alert.showAndWait();
-    }
-
-    /**
-     * Application main starting method
-     * @param args application arguments
-     */
-    public static void main(String[] args) {
-        launch(args);
     }
 }

@@ -15,10 +15,13 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
-import vut.fit.ija.proj1.data.*;
-import vut.fit.ija.proj1.gui.elements.VehicleStop;
+import vut.fit.ija.proj1.data.ApplicationState;
+import vut.fit.ija.proj1.data.PathBetweenStops;
+import vut.fit.ija.proj1.data.TimetableEntry;
+import vut.fit.ija.proj1.data.VehicleLine;
 import vut.fit.ija.proj1.gui.elements.Street;
 import vut.fit.ija.proj1.gui.elements.Vehicle;
+import vut.fit.ija.proj1.gui.elements.VehicleStop;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -76,30 +79,25 @@ public class MainController {
     private ChangeListener<Number> trafficListener;
     private ChangeListener<Boolean> closedListener;
 
-    private OnSelect<Street> defaultOnStreetSelectListener = new OnSelect<Street>() {
+    private final OnSelect<Street> defaultOnStreetSelectListener = new OnSelect<Street>() {
         @Override
         public boolean onSelect(Street selected) {
             deselectItem();
             streetConfig.setVisible(true);
-
             traffic.setValue(selected.getTraffic());
             streetClosed.setSelected(selected.isClosed());
-
             trafficListener = (observable, oldValue, newValue) -> selected.setTraffic(newValue.doubleValue());
-
             traffic.valueProperty().addListener(trafficListener);
-
             closedListener = (observable, oldValue, newValue) -> selected.setClosed(newValue);
-
             streetClosed.selectedProperty().addListener(closedListener);
-
             selectedShape = selected;
+            selected.setSelected(true);
             return true;
         }
 
         @Override
         public boolean onDeselect(Street deselected) {
-            return true;
+            return false;
         }
     };
 

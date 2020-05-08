@@ -17,11 +17,11 @@ import java.util.List;
  * Class representing path on the map
  */
 public class Path {
-    private Coordinates startCoordinates;
-    private Coordinates stopCoordinates;
+    private final Coordinates startCoordinates;
+    private final Coordinates stopCoordinates;
     private List<Coordinates> path;
-    private List<Street> streets;
-    private Duration delay;
+    private final List<Street> streets;
+    private final Duration delay;
 
     /**
      * Constructs a new path
