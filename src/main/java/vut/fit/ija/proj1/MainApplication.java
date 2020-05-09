@@ -45,7 +45,7 @@ public class MainApplication extends Application {
         Parent root = loader.load();
         Scene scene = new Scene(root);
         scene.getStylesheets().clear();
-        scene.getStylesheets().add("file://" + getClass().getResource("/style.css").getFile());
+        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.setTitle("IJA Projekt");
         primaryStage.show();
