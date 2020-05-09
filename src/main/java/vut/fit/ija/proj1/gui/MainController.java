@@ -23,7 +23,13 @@ import vut.fit.ija.proj1.gui.elements.Street;
 import vut.fit.ija.proj1.gui.elements.Vehicle;
 import vut.fit.ija.proj1.gui.elements.VehicleStop;
 
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Timer;
@@ -54,13 +60,15 @@ public class MainController {
     @FXML
     private Button setTimeScaleButton;
     @FXML
-    private Label time;
+    private TextField time;
     @FXML
     private ListView<TimetableEntry> listView;
     @FXML
     private ScrollPane scroll;
     @FXML
     private Pane content;
+    @FXML
+    private Button setTimeButton;
     @FXML
     private Button exitLineEditModeButton;
 
@@ -135,19 +143,63 @@ public class MainController {
         lineModifyMode.addPath(() -> setStopsSelectable(false));
     }
 
+    @FXML
+    private void onTimeSet() {
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+        try {
+            localTime = LocalDateTime.ofInstant(format.parse(time.getText()).toInstant(), ZoneId.systemDefault()).toLocalTime();
+        } catch (ParseException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Invalid time");
+            alert.setHeaderText("Invalid time");
+            alert.setContentText("Provided time is invalid. Time must be in format HH:mm:ss");
+            alert.showAndWait();
+            return;
+        }
+        for(Vehicle vehicle : vehicles) {
+            vehicle.moveTimeChange(localTime);
+        }
+    }
+
+    @FXML
+    private void updateCss() {
+        File css = new File("data/style.css");
+        applicationState.getScene().getStylesheets().clear();
+        applicationState.getScene().getStylesheets().add("file:///" + css.getAbsolutePath().replace("\\", "/"));
+    }
+
     /**
      * Gets called when button for time scale changing is pressed
      */
     @FXML
     private void onTimeScaleSet() {
-        float scale = Float.parseFloat(timeScale.getText());
-        if(scale == 0) {
+        try {
+            float scale = Float.parseFloat(timeScale.getText());
+            if(scale == 0) {
+                time.setDisable(false);
+                setTimeButton.setDisable(false);
+                timer.cancel();
+                return;
+            } else if (scale < 0 || scale > 999) {
+                showInvalidScaleError();
+                return;
+            }
             timer.cancel();
-            timer = new Timer();
-            return;
+            startTime(scale);
+        } catch (NumberFormatException e) {
+            showInvalidScaleError();
         }
-        timer.cancel();
-        startTime(scale);
+    }
+
+    /**
+     * Prints user message with text for invalid time scale
+     */
+    void showInvalidScaleError() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Invalid scale value");
+        alert.setHeaderText("Invalid scale value");
+        alert.setContentText("Invalid scale value provided. Value can be in range 0-999");
+        alert.showAndWait();
     }
 
     /**
@@ -178,6 +230,7 @@ public class MainController {
         this.vehicles = vehicles;
         for(Vehicle vehicle : vehicles) {
             content.getChildren().addAll(vehicle.draw());
+            vehicle.moveTimeChange(localTime);
         }
     }
 
@@ -357,7 +410,9 @@ public class MainController {
                 listView.setItems(FXCollections.observableArrayList(selected.getTimetable().getEntries()));
                 Shape shape = selected.getLine().getGui();
                 vehicleLineGuiShape = shape;
-                content.getChildren().add(shape);
+                if(shape != null) {
+                    content.getChildren().add(shape);
+                }
                 return true;
             }
 
@@ -376,6 +431,9 @@ public class MainController {
      * @param scale time scale
      */
     public void startTime(float scale) {
+        time.setDisable(scale != 0);
+        setTimeButton.setDisable(scale != 0);
+
         timer = new Timer(false);
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -398,7 +456,8 @@ public class MainController {
      * Sets up line modify mode
      */
     public void setupLineModify() {
+        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         lineModifyMode = new LineModifyMode(content, lineListView, stopListView, pathListView, lines, exitLineEditModeButton);
-
     }
 }

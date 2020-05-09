@@ -143,6 +143,7 @@ public class LineModifyMode {
                     setContextMenu(new ContextMenu(delete));
                     setText(stop.toString());
                 }
+
             }
         });
 
@@ -163,7 +164,7 @@ public class LineModifyMode {
                     setTooltip(new Tooltip(String.format("Delay: %s", path.getDelay())));
                     setText(path.toString());
                     if(path.isInvalid()) {
-                        setStyle("-fx-background-color: #ff867c;");
+                        setStyle("-fx-background-color: #9f0000;-fx-text-fill: white;");
                     }
                 }
             }
@@ -187,7 +188,7 @@ public class LineModifyMode {
                     }
 
                     if(invalid) {
-                        setStyle("-fx-background-color: #ff867c;");
+                        setStyle("-fx-background-color: #9f0000;-fx-text-fill: white;");
                     }
                 }
             }

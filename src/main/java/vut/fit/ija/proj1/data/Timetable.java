@@ -52,7 +52,11 @@ public class Timetable {
     @JsonIgnore
     public TimetableEntry getNextEntry(LocalTime currentTime, List<VehicleStop> stops) {
         TimetableEntry next = null;
+        TimetableEntry first = null;
         for (TimetableEntry entry : entries) {
+            if(first == null || entry.getTime().isBefore(first.getTime())) {
+                first = entry;
+            }
             if(next == null && entry.getTime().isAfter(currentTime) && stops.contains(entry.getStop())) {
                 next = entry;
             } else if (next != null &&
@@ -61,6 +65,9 @@ public class Timetable {
                     stops.contains(entry.getStop())) {
                 next = entry;
             }
+        }
+        if(next == null) {
+            next = first;
         }
         return next;
     }
@@ -74,7 +81,11 @@ public class Timetable {
     @JsonIgnore
     public TimetableEntry getPreviousEntry(LocalTime currentTime, List<VehicleStop> stops) {
         TimetableEntry previous = null;
+        TimetableEntry last = null;
         for (TimetableEntry entry : entries) {
+            if(last == null || entry.getTime().isBefore(last.getTime())) {
+                last = entry;
+            }
             if(previous == null &&
                     entry.getTime().isBefore(currentTime) &&
                     stops.contains(entry.getStop())
@@ -88,6 +99,9 @@ public class Timetable {
                 previous = entry;
             }
 
+        }
+        if(previous == null) {
+            previous = last;
         }
         return previous;
     }

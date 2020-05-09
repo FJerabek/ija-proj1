@@ -22,7 +22,6 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Class representing vehicle on the map
@@ -95,9 +94,12 @@ public class Vehicle implements Drawable, Selectable<Vehicle> {
      * Creates and sets gui
      */
     private void createGui() {
-        tooltip = new Tooltip(String.format("Delay: %s\nNext stop: %s", delay, nextEntry != null? nextEntry.getStop(): ""));
+        tooltip = new Tooltip();
+        updateTooltip();
         Circle circle = new Circle(position.getX(), position.getY(), 7, line.getColor());
+        circle.setId("vehicleCircle");
         Text text = new Text(position.getX() + 7, position.getY() + 4, line.getName());
+        text.setId("vehicleText");
         Tooltip.install(circle, tooltip);
         Tooltip.install(text, tooltip);
         text.setFont(Font.font(text.getFont().getFamily(), FontWeight.BOLD, 15));
@@ -216,7 +218,19 @@ public class Vehicle implements Drawable, Selectable<Vehicle> {
      * @return driven distance according to time
      */
     private double getDrivenDistanceByTime(LocalTime timeFrom, LocalTime time, LocalTime timeTo, double pathLength) {
-        double drivenPart =  (time.toNanoOfDay() - timeFrom.toNanoOfDay()) / (double)Math.abs(timeTo.toNanoOfDay() - timeFrom.toNanoOfDay());
+        int fromSec = timeFrom.toSecondOfDay();
+        int toSec = timeTo.toSecondOfDay();
+        int timeSec = time.toSecondOfDay();
+
+        if(Math.abs(fromSec - toSec) > 12 * 60 * 60) {
+            if(fromSec < toSec) {
+                fromSec += 24 * 60 * 60;
+            } else {
+                toSec += 24 * 60 * 60;
+            }
+        }
+
+        double drivenPart =  (timeSec - fromSec) / (double)Math.abs(toSec - fromSec);
         return pathLength * drivenPart;
     }
 
@@ -225,7 +239,7 @@ public class Vehicle implements Drawable, Selectable<Vehicle> {
      * Updates vehicle tooltip with current properties
      */
     private void updateTooltip() {
-        tooltip.setText(String.format("Delay: %s\nNext stop: %s", delay, nextEntry != null? nextEntry.getStop(): ""));
+        tooltip.setText(String.format("Delay: %s s\nNext stop: %s", delay.getSeconds(), nextEntry != null? nextEntry.getStop(): ""));
     }
 
     /**
@@ -251,11 +265,13 @@ public class Vehicle implements Drawable, Selectable<Vehicle> {
     public void drive(LocalTime time) {
         time = time.minusSeconds(offset);
         time = time.minus(delay);
+
         if(currentStop == null) {
             currentStop = timetable.getPreviousEntry(time, getLine().getStops());
             if(currentStop == null)
                 return;
         }
+
         if(nextEntry == null) {
             nextEntry = timetable.getNextEntry(time, getLine().getStops());
             if(nextEntry == null) {
@@ -263,59 +279,90 @@ public class Vehicle implements Drawable, Selectable<Vehicle> {
             }
             updateTooltip();
         }
-        if((time.isAfter(nextEntry.getTime().plus(path != null? path.getDelay() : Duration.ofSeconds(0))) ||
-                //Or time is 12 hours after current time because of midnight
-                Math.abs(time.toSecondOfDay() - nextEntry.getTime().toSecondOfDay()) > LocalTime.of(12,0).toSecondOfDay())
-                        && inStop) {
-            delay = Duration.ofSeconds(time.toSecondOfDay() - nextEntry.getTime().toSecondOfDay());
-            currentStop = nextEntry;
-            nextEntry = timetable.getNextEntry(time.minus(delay), getLine().getStops());
-            if(nextEntry == null) {
-                if(timetable.getEntries().size() > 0)
-                    nextEntry = timetable.getEntries().get(0);
-                else
-                    return;
-            }
-            path = line.getPathToNextStop(currentStop.getStop(), nextEntry.getStop());
-            if(path != null) {
-                inStop = false;
-                drivenDistance = 0;
-            }
-            updateTooltip();
-        }
-
-        if(currentStop != null && nextEntry != null) {
-            if (Objects.equals(currentStop.getStop(), nextEntry.getStop())) {
-                return;
-            }
-        } else {
-            return;
-        }
 
         if(path == null) {
             path = line.getPathToNextStop(currentStop.getStop(), nextEntry.getStop());
-            if(path == null)
-                return;
-            drivenDistance = getDrivenDistanceByTime(currentStop.getTime(), time, nextEntry.getTime().plus(path.getDelay()), path.getPathLength());
-            inStop = false;
         }
+
+        if(path != null) {
+            if(timeIsAfter(time, nextEntry.getTime().plus(path.getDelay()))) {
+                delay = Duration.ofSeconds(time.toSecondOfDay() - nextEntry.getTime().toSecondOfDay());
+                currentStop = nextEntry;
+                nextEntry = timetable.getNextEntry(time, getLine().getStops());
+                if(currentStop.getStop() == nextEntry.getStop()) {
+                    return;
+                }
+                path = line.getPathToNextStop(currentStop.getStop(), nextEntry.getStop());
+
+                if(path != null) {
+                    inStop = false;
+                    drivenDistance = 0;
+                }
+                updateTooltip();
+            }
+            if(path == null) {
+                return;
+            }
+
+            PositionInfo info = path.getPathInfoByDistance(drivenDistance);
+            if(!inStop) {
+                drivenDistance += speed * (1 - info.getStreet().getTraffic());
+            }
+
+            if(drivenDistance > path.getPathLength()) {
+                inStop = true;
+            }
+
+
+            info = path.getPathInfoByDistance(drivenDistance);
+            Coordinates coords = info.getCoordinates();
+            moveGuiPoint(coords.getX() - position.getX(), coords.getY() - position.getY());
+            position = coords;
+        }
+
+    }
+
+    /**
+     * Moves vehicle to position according to its timetable and actual time
+     * @param time actual time
+     */
+    public void moveTimeChange(LocalTime time) {
+        delay = Duration.ZERO;
+        time = time.minusSeconds(offset);
+        currentStop = timetable.getPreviousEntry(time, getLine().getStops());
+        nextEntry = timetable.getNextEntry(time, getLine().getStops());
+        path = line.getPathToNextStop(currentStop.getStop(), nextEntry.getStop());
+        if(path == null) {
+            return;
+        }
+        drivenDistance = getDrivenDistanceByTime(currentStop.getTime(), time, nextEntry.getTime().plus(path.getDelay()), path.getPathLength());
 
         PositionInfo info = path.getPathInfoByDistance(drivenDistance);
-        if(!inStop) {
-            drivenDistance += speed * (1 - info.getStreet().getTraffic());
-        }
-
-        if(drivenDistance > path.getPathLength()) {
-            inStop = true;
-        }
-
-        if(drivenDistance < 0)
-            return;
-
-        info = path.getPathInfoByDistance(drivenDistance);
         Coordinates coords = info.getCoordinates();
         moveGuiPoint(coords.getX() - position.getX(), coords.getY() - position.getY());
         position = coords;
+        inStop = false;
+    }
+
+    /**
+     * Checks if one time is after another time with midnight check. If times are 12 hours apart. A 24 hour value is
+     * added to the lower time value
+     * @param a first time
+     * @param b second time
+     * @return first time is after second time
+     */
+    public boolean timeIsAfter(LocalTime a, LocalTime b) {
+        int aSec = a.toSecondOfDay();
+        int bSec = b.toSecondOfDay();
+        if(Math.abs(aSec - bSec) > 12 * 60 * 60) { //> 12 hours delay = Midnight
+            if(aSec < bSec) {
+                return (aSec + 24 * 60 * 60) > bSec;
+            } else {
+                return aSec > (bSec + 24 * 60 * 60);
+            }
+        } else {
+            return aSec > bSec;
+        }
     }
 
     @Override

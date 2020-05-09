@@ -1,0 +1,76 @@
+.root,
+#mainLayout,
+.scroll-pane:pannable > .viewport,
+.scroll-pane:pannable,
+#content,
+#stackPane,
+#group {
+    -fx-background-color: #1b1b1b;
+}
+
+.list-view {
+    -fx-background-color: #484848;
+}
+
+.list-cell:selected:focused {
+    -fx-background-color: #1b1b1b;
+    -fx-text-fill: white;
+}
+
+.list-cell:even {
+    -fx-background-color: #484848;
+    -fx-text-fill: white;
+}
+
+.list-cell:odd {
+    -fx-background-color: #424242;
+    -fx-text-fill: white;
+}
+
+.text-field {
+    -fx-text-fill: white;
+    -fx-highlight-fill: #6d6d6d;
+    -fx-background-color: #484848;
+}
+
+.button {
+    -fx-text-fill: white;
+    -fx-background-color: #1b1b1b;
+    -fx-border-color: #6d6d6d;
+}
+
+.button:armed {
+    -fx-background-color: #484848;
+}
+
+.check-box {
+    -fx-text-fill: white;
+}
+
+
+
+.check-box > .box {
+    -fx-background-color: #6d6d6d;
+    -fx-background-radius: 0;
+}
+
+.check-box:selected .mark  {
+    -fx-background-color: white;
+}
+
+#vehicleText, #streetText, #stopText {
+    -fx-fill: white;
+}
+
+#streetLine {
+    -fx-stroke: #484848;
+}
+
+.label > .text {
+    -fx-fill: white;
+}
+
+.context-menu {
+    -fx-background-color: #484848;
+    -fx-text-fill: white;
+}

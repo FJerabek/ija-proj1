@@ -31,7 +31,7 @@ import java.util.Objects;
 })
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class VehicleStop implements Drawable, Selectable<VehicleStop> {
-    private static final Color SELECTED_COLOR = Color.valueOf("#263238");
+    private static final Color SELECTED_COLOR = Color.valueOf("#ffffff");
     private String id;
     private Coordinates coordinates;
     private boolean selected = false;
@@ -88,7 +88,9 @@ public class VehicleStop implements Drawable, Selectable<VehicleStop> {
     @Override
     public List<Shape> draw() {
         Text text = new Text(coordinates.getX() + 10, coordinates.getY(), id);
+        text.setId("stopText");
         Circle circle = new Circle(coordinates.getX(), coordinates.getY(), 5, Color.RED);
+        circle.setId("stopCircle");
         List<Shape> gui = Arrays.asList(text, circle);
         selectableGui = circle;
 

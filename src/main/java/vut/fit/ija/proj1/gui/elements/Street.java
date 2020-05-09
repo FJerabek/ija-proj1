@@ -10,7 +10,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.util.StdConverter;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
@@ -39,6 +41,7 @@ import java.util.Objects;
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "name")
 public class Street implements Drawable, Selectable<Street> {
     private final Color SELECTED_COLOR = Color.valueOf("#d32f2f");
+    private Paint defaultPaint;
     private String name;
     private List<VehicleStop> stops;
     private Coordinates from;
@@ -70,21 +73,6 @@ public class Street implements Drawable, Selectable<Street> {
         this.from = from;
         this.to = to;
         this.stops = stops;
-
-        Text x = new Text(from.getX() + 10, from.getY() + 20, String.format("x: %s\ny: %s", from.getX(), from.getY()));
-        Text y = new Text(to.getX() + 10, to.getY() + 20, String.format("x: %s\ny: %s", to.getX(), to.getY()));
-        Font font = x.getFont();
-        font = Font.font(font.getFamily(), 8);
-        x.setFont(font);
-        y.setFont(font);
-
-
-        gui = Arrays.asList(
-                new Text(getCoordinates().getX(), getCoordinates().getY(), name),
-                x,
-                y,
-                new Line(from.getX(), from.getY(), to.getX(), to.getY())
-        );
     }
 
     /**
@@ -195,7 +183,7 @@ public class Street implements Drawable, Selectable<Street> {
      * Sets gui properties for not selected state
      */
     private void deselectGui() {
-        selectableGui.setStroke(Color.BLACK);
+        selectableGui.setStroke(defaultPaint);
         selectableGui.setStrokeWidth(1);
     }
 
@@ -203,6 +191,9 @@ public class Street implements Drawable, Selectable<Street> {
      * Sets gui properties for selected state
      */
     private void selectGui() {
+        if(defaultPaint == null) {
+            defaultPaint = selectableGui.getStroke();
+        }
         selectableGui.setStroke(SELECTED_COLOR);
         selectableGui.setStrokeWidth(3);
     }
@@ -213,9 +204,12 @@ public class Street implements Drawable, Selectable<Street> {
      */
     private void jacksonPostConstruct() {
         selectableGui = new Line(from.getX(), from.getY(), to.getX(), to.getY());
+        selectableGui.setId("streetLine");
+        Text text = new Text(getCoordinates().getX(), getCoordinates().getY(), name);
+        text.setId("streetText");
         gui = Arrays.asList(
-                new Text(getCoordinates().getX(), getCoordinates().getY(), name),
-                selectableGui
+                selectableGui,
+                text
         );
 
         for (Shape shape : gui) {

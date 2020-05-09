@@ -44,6 +44,8 @@ public class MainApplication extends Application {
         loader.setLocation(getClass().getResource("/main_layout.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
+        scene.getStylesheets().clear();
+        scene.getStylesheets().add("file://" + getClass().getResource("/style.css").getFile());
         primaryStage.setScene(scene);
         primaryStage.setTitle("IJA Projekt");
         primaryStage.show();

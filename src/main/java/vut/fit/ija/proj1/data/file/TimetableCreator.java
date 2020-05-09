@@ -65,6 +65,16 @@ public class TimetableCreator {
                 secondsOfDay += time.get(i);
             }
         } while(secondsOfDay < 86399);
+
+        for(int i = timetable.size() - 1; i >= 0; i--) {
+            if(timetable.get(i).getStop() != timetable.get(0).getStop()) {
+                timetable.remove(i);
+            } else {
+                timetable.remove(i);
+                break;
+            }
+        }
+
         return new Timetable(timetable);
     }
 }
