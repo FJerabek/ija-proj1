@@ -15,7 +15,6 @@
     <pathelement location="${lib.dir}/jackson-dataformat-yaml-2.9.9.jar"/>
     <pathelement location="${lib.dir}/jackson-datatype-jsr310-2.9.9.jar"/>
     <pathelement location="${lib.dir}/snakeyaml-1.23.jar"/>
-    <pathelement location="C:\Program Files\Java\jdk1.8.0_231\jre\lib\ext\jfxrt.jar"/>
   </path>
 
 
